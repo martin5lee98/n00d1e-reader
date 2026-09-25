@@ -1,0 +1,192 @@
+---
+// src/layouts/SiteLayout.astro
+//
+// Shared page chrome (topbar, logo, category nav, base typography) --
+// a faithful port of homepage-mockup.html / latest-mockup.html's shared
+// styling, not a redesign. Both index.astro and latest.astro use this
+// so the chrome is defined once, matching the approved mockups exactly
+// rather than duplicated (and potentially drifting) across pages.
+
+export interface Props {
+  title: string;
+  activeNav: "home" | "finance" | "tech" | "culture" | "opinion" | "society" | "life" | "latest";
+}
+
+const { title, activeNav } = Astro.props;
+
+const NAV_ITEMS: { key: Props["activeNav"]; label: string; href: string }[] = [
+  { key: "home", label: "首页", href: "/" },
+  { key: "finance", label: "财经 / 公司", href: "/category/finance" },
+  { key: "tech", label: "科技", href: "/category/tech" },
+  { key: "culture", label: "文化 / 读书", href: "/category/culture" },
+  { key: "opinion", label: "评论", href: "/category/opinion" },
+  { key: "society", label: "社会", href: "/category/society" },
+  { key: "life", label: "生活", href: "/category/life" },
+  { key: "latest", label: "最新", href: "/latest" },
+];
+
+const today = new Intl.DateTimeFormat("zh-CN", {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+  weekday: "long",
+}).format(new Date());
+---
+
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{title}</title>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a href="/about">关于本站</a>
+    <a href="/rss">RSS 订阅</a>
+    <div class="topbar-spacer"></div>
+    <span>{today}</span>
+  </div>
+</div>
+
+<header class="site">
+  <div class="logo-row">
+    <h1>阅览室</h1>
+    <span class="tagline">中文媒体聚合 · 只做标题与摘要，不转载全文</span>
+  </div>
+  <nav class="categories">
+    <ul>
+      {NAV_ITEMS.map((item) => (
+        <li class={item.key === activeNav ? "active" : ""}>
+          <a href={item.href}>{item.label}</a>
+        </li>
+      ))}
+    </ul>
+  </nav>
+</header>
+
+<main>
+  <slot />
+</main>
+
+<footer>
+  本站仅聚合标题、摘要与来源链接，不提供全文转载。所有内容版权归原作者及原媒体所有。
+</footer>
+
+<style is:global>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: #ffffff;
+    color: #222222;
+    font-family: "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .topbar {
+    background: #f6f6f6;
+    border-bottom: 1px solid #d9d9d9;
+  }
+  .topbar-inner {
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    height: 34px;
+    font-size: 12px;
+    color: #777;
+  }
+  .topbar-inner a { color: #777; text-decoration: none; margin-right: 14px; }
+  .topbar-inner a:hover { text-decoration: underline; }
+  .topbar-spacer { flex: 1; }
+
+  header.site {
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 18px 16px 0 16px;
+  }
+  .logo-row {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .logo-row h1 {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 0;
+    color: #1a1a1a;
+    font-family: Georgia, "Songti SC", serif;
+  }
+  .logo-row .tagline {
+    font-size: 12px;
+    color: #999;
+  }
+
+  nav.categories {
+    background: #eef3f9;
+    border: 1px solid #c9d7e5;
+    border-radius: 3px;
+  }
+  nav.categories ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+  }
+  nav.categories li { border-right: 1px solid #c9d7e5; }
+  nav.categories li:last-child { border-right: none; }
+  nav.categories a {
+    display: block;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: bold;
+    color: #2255a4;
+    text-decoration: none;
+  }
+  nav.categories a:hover { background: #dce8f5; text-decoration: underline; }
+  nav.categories li.active a { background: #2255a4; color: #fff; }
+  nav.categories li.active a:hover { text-decoration: none; }
+
+  main {
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 18px 16px 40px 16px;
+  }
+
+  .cat-section { margin-bottom: 8px; }
+  .cat-section h2 {
+    font-size: 15px;
+    font-weight: bold;
+    color: #1a1a1a;
+    margin: 0 0 10px 0;
+    padding-bottom: 5px;
+    border-bottom: 2px solid #2255a4;
+  }
+
+  .block-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 24px;
+  }
+  .block-grid.single-col {
+    grid-template-columns: 1fr;
+    max-width: 640px;
+  }
+
+  footer {
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 14px 16px 30px 16px;
+    border-top: 1px solid #ddd;
+    color: #999;
+    font-size: 11px;
+  }
+</style>
+
+</body>
+</html>

@@ -1,0 +1,86 @@
+---
+// src/components/ArticleThumbnail.astro
+//
+// Single reusable image component for article thumbnails across the
+// homepage, /latest, and category pages. Deliberately the ONLY place
+// in the codebase that knows HOW images are served (currently: proxied
+// through /img/{width}/{encoded-source-url}, per the Cloudflare Image
+// Resizing "Transform via Workers" approach -- see
+// src/pages/img/[...params].ts). Every template calls THIS component,
+// never <img src={article.image_url}> directly, so that changing the
+// underlying strategy later (e.g. switching to R2-stored images, or
+// back to plain hotlinking) is a change to this one file, not every
+// template that shows an image.
+//
+// Handles the two things every real thumbnail needs regardless of
+// source: a fixed-aspect-ratio container (object-fit: cover, so images
+// of differing native aspect ratios don't distort or cause layout
+// shift) and an onerror fallback (a inline placeholder swapped in if
+// the proxied image fails to load -- e.g. the source is genuinely down,
+// or a not-yet-allowlisted host, see [...params].ts's ALLOWED_SOURCE_HOSTS).
+//
+// image_url may legitimately be null (several sites' scrapers produce
+// image-less articles, e.g. thepaper.cn items without a `pic`, or
+// bbtnews items with no <img> in the source HTML) -- this component
+// renders nothing (not a broken-image icon, not an empty box) when
+// that's the case, matching the "plain list, no featured treatment"
+// fallback pattern from the original homepage mockup.
+
+export interface Props {
+  src: string | null;
+  alt: string;
+  size?: 72 | 150 | 300 | 700; // must match ALLOWED_WIDTHS in [...params].ts
+  className?: string;
+}
+
+const { src, alt, size = 72, className = "" } = Astro.props;
+
+function buildProxyUrl(sourceUrl: string, width: number): string {
+  return `/img/${width}/${encodeURIComponent(sourceUrl)}`;
+}
+
+const proxySrc = src ? buildProxyUrl(src, size) : null;
+---
+
+{proxySrc && (
+  <span class={`article-thumb ${className}`} style={`--thumb-size: ${size}px`}>
+    <img
+      src={proxySrc}
+      alt={alt}
+      loading="lazy"
+      width={size}
+      height={size}
+      onerror="this.closest('.article-thumb').classList.add('article-thumb--broken')"
+    />
+  </span>
+)}
+
+<style>
+  .article-thumb {
+    display: inline-block;
+    width: var(--thumb-size, 72px);
+    height: var(--thumb-size, 72px);
+    flex-shrink: 0;
+    overflow: hidden;
+    background: #e5e5e5;
+    border: 1px solid #ddd;
+  }
+
+  .article-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* When onerror fires, the broken <img> is hidden and a plain neutral
+     background is left in its place -- deliberately not a "broken
+     image" glyph or a loud error state, since a missing thumbnail on a
+     single article isn't something a reader needs to be alarmed by. */
+  .article-thumb--broken img {
+    display: none;
+  }
+  .article-thumb--broken {
+    background: #e5e5e5;
+  }
+</style>

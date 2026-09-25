@@ -1,0 +1,231 @@
+---
+// src/components/ColumnBlock.astro
+//
+// Renders one outlet/column card -- the "Yicai / Books" style block
+// from the original mockup (homepage-mockup.html / latest-mockup.html),
+// which the user approved before any real data existed. This component
+// is a faithful PORT of that approved markup and CSS, not a redesign:
+// every class name, color, and spacing value below is copied from the
+// mockup files, not reinvented. The two things that changed from the
+// static mockup are (1) real data from D1 instead of hardcoded example
+// articles, and (2) ArticleThumbnail instead of a placehold.co <img>.
+//
+// Used by both the homepage (grouped by category, showCategoryTag=false
+// since the section heading already says the category) and /latest
+// (grouped by recency, showCategoryTag=true + showUpdatedBadge=true,
+// matching latest-mockup.html's additions on top of the base block).
+
+import type { ColumnBlock as ColumnBlockData } from "../lib/db";
+import ArticleThumbnail from "./ArticleThumbnail.astro";
+
+export interface Props {
+  block: ColumnBlockData;
+  showCategoryTag?: boolean;
+  showUpdatedBadge?: boolean;
+}
+
+const { block, showCategoryTag = false, showUpdatedBadge = false } = Astro.props;
+
+const [featured, ...rest] = block.articles;
+
+// Category display names -- matches the nav bar labels from the
+// original mockup (首页/财经·公司/科技/文化·读书/评论/社会/生活/最新).
+// Kept here rather than in the DB since these are presentation labels,
+// not data -- the `category` column stores the English slug
+// (culture/tech/finance/opinion/society/life) that the registry uses.
+const CATEGORY_LABELS: Record<string, string> = {
+  culture: "文化",
+  tech: "科技",
+  finance: "财经",
+  opinion: "评论",
+  society: "社会",
+  life: "生活",
+};
+
+function formatUpdatedBadge(lastActivity: string | undefined): string {
+  if (!lastActivity) return "";
+  // fetched_at is stored as "YYYY-MM-DD HH:MM:SS" (SQLite's
+  // datetime('now') format, UTC) -- see schema.sql's DEFAULT clause.
+  const then = new Date(lastActivity.replace(" ", "T") + "Z");
+  const now = new Date();
+  const diffMs = now.getTime() - then.getTime();
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+  if (diffHours < 1) return "刚刚更新";
+  if (diffHours < 24) return `${diffHours} 小时前更新`;
+  const diffDays = Math.floor(diffHours / 24);
+  if (diffDays === 1) return "昨天更新";
+  return `${diffDays} 天前更新`;
+}
+
+function formatArticleMeta(article: { author: string | null }): string | null {
+  // Matches the mockup's per-item meta line ("张三 · 3 小时前") --
+  // simplified here to author-only, since a precise per-article
+  // relative-time string needs the same fetched_at-vs-published_at
+  // ambiguity handling as the updated badge, and the mockup's example
+  // times were illustrative, not tied to real data. Author is shown
+  // when present; nothing rendered when absent, matching how several
+  // site scrapers (thepaper.cn's some columns, ftchinese/bbtnews
+  // no-name cases) legitimately have no author.
+  return article.author || null;
+}
+---
+
+<div class="col-block">
+  <div class="col-block-head">
+    <span class="src">
+      <a href={block.source_url} target="_blank" rel="noopener">{block.outlet_name}</a>
+      {block.column_name && (
+        <>
+          {" / "}
+          <span class="col-name">
+            <a href={block.source_url} target="_blank" rel="noopener">{block.column_name}</a>
+          </span>
+        </>
+      )}
+      {showCategoryTag && (
+        <span class="cat-tag">{CATEGORY_LABELS[block.category] || block.category}</span>
+      )}
+    </span>
+    {showUpdatedBadge && (
+      <span class="updated">{formatUpdatedBadge(block.last_activity)}</span>
+    )}
+  </div>
+
+  <div class="col-body">
+    {featured && (
+      <div class="featured">
+        <ArticleThumbnail src={featured.image_url} alt={featured.title} size={72} />
+        <div class="featured-text">
+          <div class="headline">
+            <a href={featured.url} target="_blank" rel="noopener">{featured.title}</a>
+          </div>
+          {featured.description && <div class="desc">{featured.description}</div>}
+          {formatArticleMeta(featured) && (
+            <div class="meta">{formatArticleMeta(featured)}</div>
+          )}
+        </div>
+      </div>
+    )}
+
+    {rest.length > 0 && (
+      <ul class="headline-list">
+        {rest.map((article) => (
+          <li>
+            <a href={article.url} target="_blank" rel="noopener">{article.title}</a>
+            {formatArticleMeta(article) && (
+              <span class="meta">{formatArticleMeta(article)}</span>
+            )}
+          </li>
+        ))}
+      </ul>
+    )}
+
+    <div class="load-more">
+      <a href={`/c/${block.column_key}`}>查看更多</a>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Every rule below is copied from homepage-mockup.html /
+     latest-mockup.html, not reinvented -- see this file's header
+     comment. */
+  .col-block {
+    border: 1px solid #dddddd;
+    background: #fbfbfb;
+    margin-bottom: 18px;
+  }
+  .col-block-head {
+    background: #f0f0f0;
+    border-bottom: 1px solid #dddddd;
+    padding: 6px 10px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+  }
+  .col-block-head .src {
+    font-size: 12px;
+    font-weight: bold;
+  }
+  .col-block-head .src a { color: #555; text-decoration: none; }
+  .col-block-head .src a:hover { text-decoration: underline; }
+  .col-block-head .col-name { color: #2255a4; }
+  .col-block-head .col-name a { color: #2255a4; text-decoration: none; }
+  .col-block-head .col-name a:hover { text-decoration: underline; }
+  .col-block-head .updated { font-size: 11px; color: #999; }
+  .cat-tag {
+    display: inline-block;
+    font-size: 10px;
+    color: #2255a4;
+    background: #eef3f9;
+    border: 1px solid #c9d7e5;
+    border-radius: 2px;
+    padding: 0 5px;
+    margin-left: 8px;
+    font-weight: normal;
+    vertical-align: 1px;
+  }
+
+  .col-body { padding: 10px; }
+
+  .featured {
+    display: flex;
+    gap: 10px;
+    padding-bottom: 10px;
+    margin-bottom: 8px;
+    border-bottom: 1px dashed #cccccc;
+  }
+  .featured-text .headline a {
+    color: #15c;
+    text-decoration: underline;
+    font-size: 13.5px;
+    font-weight: bold;
+    line-height: 1.4;
+  }
+  .featured-text .headline a:visited { color: #63b; }
+  .featured-text .desc {
+    color: #555;
+    font-size: 12px;
+    margin-top: 4px;
+    line-height: 1.5;
+  }
+  .featured-text .meta {
+    font-size: 11px;
+    color: #999;
+    margin-top: 4px;
+  }
+
+  ul.headline-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  ul.headline-list li {
+    padding: 4px 0;
+    border-bottom: 1px solid #eeeeee;
+  }
+  ul.headline-list li:last-child { border-bottom: none; }
+  ul.headline-list a {
+    color: #15c;
+    text-decoration: underline;
+    font-size: 12.5px;
+  }
+  ul.headline-list a:visited { color: #63b; }
+  ul.headline-list .meta {
+    color: #999;
+    font-size: 11px;
+    margin-left: 6px;
+  }
+
+  .load-more {
+    margin-top: 8px;
+    text-align: right;
+  }
+  .load-more a {
+    font-size: 11px;
+    color: #777;
+    text-decoration: none;
+  }
+  .load-more a:hover { text-decoration: underline; color: #2255a4; }
+  .load-more a::after { content: " »"; }
+</style>

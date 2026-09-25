@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+<meta charset="UTF-8">
+<title>中文资讯聚合 — 最新 mockup</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: #ffffff;
+    color: #222222;
+    font-family: "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  /* top bar */
+  .topbar {
+    background: #f6f6f6;
+    border-bottom: 1px solid #d9d9d9;
+  }
+  .topbar-inner {
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    height: 34px;
+    font-size: 12px;
+    color: #777;
+  }
+  .topbar-inner a { color: #777; text-decoration: none; margin-right: 14px; }
+  .topbar-inner a:hover { text-decoration: underline; }
+  .topbar-spacer { flex: 1; }
+
+  /* header + nav */
+  header.site {
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 18px 16px 0 16px;
+  }
+  .logo-row {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .logo-row h1 {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 0;
+    color: #1a1a1a;
+    font-family: Georgia, "Songti SC", serif;
+  }
+  .logo-row .tagline {
+    font-size: 12px;
+    color: #999;
+  }
+
+  nav.categories {
+    background: #eef3f9;
+    border: 1px solid #c9d7e5;
+    border-radius: 3px;
+  }
+  nav.categories ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+  }
+  nav.categories li { border-right: 1px solid #c9d7e5; }
+  nav.categories li:last-child { border-right: none; }
+  nav.categories a {
+    display: block;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: bold;
+    color: #2255a4;
+    text-decoration: none;
+  }
+  nav.categories a:hover { background: #dce8f5; text-decoration: underline; }
+  nav.categories li.active a { background: #2255a4; color: #fff; }
+  nav.categories li.active a:hover { text-decoration: none; }
+
+  main {
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 18px 16px 40px 16px;
+  }
+
+  .cat-section { margin-bottom: 8px; }
+  .cat-section h2 {
+    font-size: 15px;
+    font-weight: bold;
+    color: #1a1a1a;
+    margin: 0 0 10px 0;
+    padding-bottom: 5px;
+    border-bottom: 2px solid #2255a4;
+  }
+
+  /* two-column grid of column blocks per category */
+  .block-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 24px;
+  }
+  .block-grid.single-col {
+    grid-template-columns: 1fr;
+    max-width: 640px;
+  }
+
+  .col-block {
+    border: 1px solid #dddddd;
+    background: #fbfbfb;
+    margin-bottom: 18px;
+  }
+  .col-block-head {
+    background: #f0f0f0;
+    border-bottom: 1px solid #dddddd;
+    padding: 6px 10px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+  }
+  .col-block-head .src {
+    font-size: 12px;
+    font-weight: bold;
+  }
+  .col-block-head .src a { color: #555; text-decoration: none; }
+  .col-block-head .src a:hover { text-decoration: underline; }
+  .col-block-head .col-name {
+    color: #2255a4;
+  }
+  .col-block-head .col-name a { color: #2255a4; text-decoration: none; }
+  .col-block-head .col-name a:hover { text-decoration: underline; }
+  .col-block-head .updated {
+    font-size: 11px;
+    color: #999;
+  }
+  .cat-tag {
+    display: inline-block;
+    font-size: 10px;
+    color: #2255a4;
+    background: #eef3f9;
+    border: 1px solid #c9d7e5;
+    border-radius: 2px;
+    padding: 0 5px;
+    margin-left: 8px;
+    font-weight: normal;
+    vertical-align: 1px;
+  }
+
+  .col-body { padding: 10px; }
+
+  /* featured item with image+desc */
+  .featured {
+    display: flex;
+    gap: 10px;
+    padding-bottom: 10px;
+    margin-bottom: 8px;
+    border-bottom: 1px dashed #cccccc;
+  }
+  .featured img {
+    width: 72px;
+    height: 72px;
+    object-fit: cover;
+    border: 1px solid #ddd;
+    flex-shrink: 0;
+    background: #e5e5e5;
+  }
+  .featured-text .headline a {
+    color: #15c;
+    text-decoration: underline;
+    font-size: 13.5px;
+    font-weight: bold;
+    line-height: 1.4;
+  }
+  .featured-text .headline a:visited { color: #63b; }
+  .featured-text .desc {
+    color: #555;
+    font-size: 12px;
+    margin-top: 4px;
+    line-height: 1.5;
+  }
+  .featured-text .meta {
+    font-size: 11px;
+    color: #999;
+    margin-top: 4px;
+  }
+
+  /* plain headline list */
+  ul.headline-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  ul.headline-list li {
+    padding: 4px 0;
+    border-bottom: 1px solid #eeeeee;
+  }
+  ul.headline-list li:last-child { border-bottom: none; }
+  ul.headline-list a {
+    color: #15c;
+    text-decoration: underline;
+    font-size: 12.5px;
+  }
+  ul.headline-list a:visited { color: #63b; }
+  ul.headline-list .meta {
+    color: #999;
+    font-size: 11px;
+    margin-left: 6px;
+  }
+
+  .load-more {
+    margin-top: 8px;
+    text-align: right;
+  }
+  .load-more a {
+    font-size: 11px;
+    color: #777;
+    text-decoration: none;
+  }
+  .load-more a:hover { text-decoration: underline; color: #2255a4; }
+  .load-more a::after { content: " »"; }
+
+  footer {
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 14px 16px 30px 16px;
+    border-top: 1px solid #ddd;
+    color: #999;
+    font-size: 11px;
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a href="#">关于本站</a>
+    <a href="#">RSS 订阅</a>
+    <div class="topbar-spacer"></div>
+    <span>2026年9月22日 星期二</span>
+  </div>
+</div>
+
+<header class="site">
+  <div class="logo-row">
+    <h1>阅览室</h1>
+    <span class="tagline">中文媒体聚合 · 只做标题与摘要，不转载全文</span>
+  </div>
+  <nav class="categories">
+    <ul>
+      <li><a href="#">首页</a></li>
+      <li><a href="#">财经 / 公司</a></li>
+      <li><a href="#">科技</a></li>
+      <li><a href="#">文化 / 读书</a></li>
+      <li><a href="#">评论</a></li>
+      <li><a href="#">社会</a></li>
+      <li><a href="#">生活</a></li>
+      <li class="active"><a href="#">最新</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main>
+
+  <div class="cat-section">
+    <div class="block-grid single-col">
+
+      <div class="col-block">
+        <div class="col-block-head">
+          <span class="src"><a href="#">腾讯科技</a><span class="cat-tag">科技</span></span>
+          <span class="updated">1 小时前更新</span>
+        </div>
+        <div class="col-body">
+          <div class="featured">
+            <img src="https://placehold.co/72x72/e5e5e5/999?text=%E5%9B%BE" alt="">
+            <div class="featured-text">
+              <div class="headline"><a href="#">国产大模型新一轮融资：谁在领投，谁在观望</a></div>
+              <div class="desc">多家机构人士透露，本轮融资估值较去年同期上涨超过一倍，但真正落地的商业化路径仍是争议焦点。</div>
+              <div class="meta">陈明 · 1 小时前</div>
+            </div>
+          </div>
+          <ul class="headline-list">
+            <li><a href="#">芯片自给率提升背后：三条技术路线的博弈</a><span class="meta">刘伟 · 4 小时前</span></li>
+            <li><a href="#">新能源车企二季度财报观察</a><span class="meta">孙芳 · 6 小时前</span></li>
+            <li><a href="#">短剧出海：一个被低估的十亿美元市场</a><span class="meta">周琳 · 昨天</span></li>
+          </ul>
+          <div class="load-more"><a href="#">查看更多</a></div>
+        </div>
+      </div>
+
+      <div class="col-block">
+        <div class="col-block-head">
+          <span class="src"><a href="#">第一财经</a> / <span class="col-name"><a href="#">阅读周刊</a></span><span class="cat-tag">文化</span></span>
+          <span class="updated">2 小时前更新</span>
+        </div>
+        <div class="col-body">
+          <div class="featured">
+            <img src="https://placehold.co/72x72/e5e5e5/999?text=%E5%9B%BE" alt="">
+            <div class="featured-text">
+              <div class="headline"><a href="#">匈牙利小说家纳道什·彼得：像做化学实验一样写小说</a></div>
+              <div class="desc">化学实验是讲究"环境"的，需要观察物质在不同的温度、压力、浓度之下，会发生的不同反应。而纳道什利用小说写作，也在做类似的事。</div>
+            </div>
+          </div>
+          <ul class="headline-list">
+            <li><a href="#">复旦大学沈奕斐：为什么要先给成年人做性教育</a></li>
+            <li><a href="#">在一所"差生"学校，开启一段正向人生</a></li>
+            <li><a href="#">小龙虾出海｜荐书</a></li>
+            <li><a href="#">面对御用瓷器瑕疵品，文物医生如何借助科技修复？</a></li>
+            <li><a href="#">战时重庆的巫医与袍哥：日常生活走向现代的契机</a></li>
+          </ul>
+          <div class="load-more"><a href="#">查看更多</a></div>
+        </div>
+      </div>
+
+      <div class="col-block">
+        <div class="col-block-head">
+          <span class="src"><a href="#">少数派</a><span class="cat-tag">科技</span></span>
+          <span class="updated">3 小时前更新</span>
+        </div>
+        <div class="col-body">
+          <div class="featured">
+            <div class="featured-text">
+              <div class="headline"><a href="#">我如何用自动化脚本重构了每天的晨间流程</a></div>
+              <div class="desc">效率工具的意义不在于工具本身，而在于它是否真正减少了你做决定的次数。</div>
+              <div class="meta">张三 · 3 小时前</div>
+            </div>
+          </div>
+          <ul class="headline-list">
+            <li><a href="#">macOS 26 上值得关注的十个小更新</a><span class="meta">李四 · 5 小时前</span></li>
+            <li><a href="#">这款 iPad 笔记应用值得你尝试的三个理由</a><span class="meta">王五 · 昨天</span></li>
+            <li><a href="#">年度效率工具评选：我们的编辑部怎么选</a><span class="meta">编辑部 · 昨天</span></li>
+            <li><a href="#">从纸质笔记到数字笔记，我经历了什么</a><span class="meta">赵六 · 2 天前</span></li>
+          </ul>
+          <div class="load-more"><a href="#">查看更多</a></div>
+        </div>
+      </div>
+
+      <div class="col-block">
+        <div class="col-block-head">
+          <span class="src"><a href="#">澎湃新闻</a> / <span class="col-name"><a href="#">思想市场</a></span><span class="cat-tag">文化</span></span>
+          <span class="updated">5 小时前更新</span>
+        </div>
+        <div class="col-body">
+          <ul class="headline-list">
+            <li><a href="#">重新理解"劳动"：一个被技术革命改写的概念</a></li>
+            <li><a href="#">从"内卷"到"躺平"：一代人的话语变迁</a></li>
+            <li><a href="#">人类学家如何看待都市青年的"搭子文化"</a></li>
+            <li><a href="#">当代艺术展览为何越来越难懂</a></li>
+            <li><a href="#">城市漫步者：本雅明在二十一世纪的回声</a></li>
+          </ul>
+          <div class="load-more"><a href="#">查看更多</a></div>
+        </div>
+      </div>
+
+      <div class="col-block">
+        <div class="col-block-head">
+          <span class="src"><a href="#">FT中文网</a> / <span class="col-name"><a href="#">远观近思</a></span><span class="cat-tag">社会</span></span>
+          <span class="updated">昨天更新</span>
+        </div>
+        <div class="col-body">
+          <div class="featured">
+            <div class="featured-text">
+              <div class="headline"><a href="#">当经济增速放缓，我们该如何重新定义"发展"</a></div>
+              <div class="desc">过去四十年支撑增长叙事的几个前提，正在同时松动——人口、外需与土地财政。</div>
+            </div>
+          </div>
+          <ul class="headline-list">
+            <li><a href="#">养老金改革的三种可能路径</a></li>
+            <li><a href="#">地方债务化解：一场没有捷径的手术</a></li>
+            <li><a href="#">从县域经济看中国内需的真实图景</a></li>
+          </ul>
+          <div class="load-more"><a href="#">查看更多</a></div>
+        </div>
+      </div>
+
+      <div class="col-block">
+        <div class="col-block-head">
+          <span class="src"><a href="#">端传媒</a> / <span class="col-name"><a href="#">评论</a></span><span class="cat-tag">评论</span></span>
+          <span class="updated">昨天更新</span>
+        </div>
+        <div class="col-body">
+          <ul class="headline-list">
+            <li><a href="#">在流量至上的时代，严肃写作还有位置吗</a></li>
+            <li><a href="#">城市更新中被遗忘的老年住户</a></li>
+            <li><a href="#">从一起劳动争议案看零工经济的法律真空</a></li>
+            <li><a href="#">当社交媒体成为唯一的公共广场</a></li>
+            <li><a href="#">教育内卷之下，谁在为"素质教育"买单</a></li>
+          </ul>
+          <div class="load-more"><a href="#">查看更多</a></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  本站仅聚合标题、摘要与来源链接，不提供全文转载。所有内容版权归原作者及原媒体所有。
+</footer>
+
+</body>
+</html>

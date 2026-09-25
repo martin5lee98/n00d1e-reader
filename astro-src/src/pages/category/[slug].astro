@@ -1,0 +1,145 @@
+---
+// src/pages/category/[slug].astro
+//
+// Category page: a flat, paginated list of articles for one category,
+// using getCategoryArticles() (src/lib/db.ts) -- that query was
+// designed alongside the homepage/latest ranked-CTE queries earlier in
+// this project, but never wired to an actual page until now.
+//
+// NO PRECEDENT IN THE APPROVED MOCKUPS: homepage-mockup.html and
+// latest-mockup.html only designed the block-grouped and single-column-
+// of-blocks layouts -- neither covers a flat paginated list. Rather
+// than invent new visual design (out of scope for wiring work, and the
+// frontend-design skill's guidance is for NEW design decisions, not
+// this kind of plumbing task), this page reuses the ALREADY-APPROVED
+// .headline-list styling from ColumnBlock.astro's ported CSS, applied
+// directly without the surrounding block chrome (no col-block-head,
+// since there's no single outlet/column to name -- each item shows its
+// own source instead). This is a conservative, minimal-new-design
+// choice, not a considered layout decision -- worth a real design pass
+// if/when this page gets more attention.
+
+import { env } from "cloudflare:workers";
+import SiteLayout from "../../layouts/SiteLayout.astro";
+import ArticleThumbnail from "../../components/ArticleThumbnail.astro";
+import { getCategoryArticles } from "../../lib/db";
+
+// CORRECTED: see src/pages/index.astro's detailed comment on why
+// Astro.locals.runtime.env.DB (the old, pre-v13-adapter pattern) was
+// replaced with a direct "cloudflare:workers" import.
+const db = env.DB;
+
+const { slug } = Astro.params;
+const validCategories = ["finance", "tech", "culture", "opinion", "society", "life"];
+
+if (!slug || !validCategories.includes(slug)) {
+  return new Response(null, { status: 404 });
+}
+
+const CATEGORY_LABELS: Record<string, string> = {
+  finance: "财经 / 公司",
+  tech: "科技",
+  culture: "文化 / 读书",
+  opinion: "评论",
+  society: "社会",
+  life: "生活",
+};
+
+const PAGE_SIZE = 30;
+const pageParam = Astro.url.searchParams.get("page");
+const page = Math.max(1, Number.parseInt(pageParam ?? "1", 10) || 1);
+const offset = (page - 1) * PAGE_SIZE;
+
+const articles = await getCategoryArticles(db, slug, PAGE_SIZE, offset);
+
+const activeNavMap: Record<string, any> = {
+  finance: "finance", tech: "tech", culture: "culture",
+  opinion: "opinion", society: "society", life: "life",
+};
+---
+
+<SiteLayout title={`阅览室 — ${CATEGORY_LABELS[slug]}`} activeNav={activeNavMap[slug]}>
+  <div class="cat-section">
+    <h2>{CATEGORY_LABELS[slug]}</h2>
+
+    {articles.length === 0 && page === 1 && (
+      <p style="color: #999; padding: 40px 0; text-align: center;">
+        暂无内容 -- 该分类下尚未有任何栏目成功抓取过文章。
+      </p>
+    )}
+
+    <ul class="category-list">
+      {articles.map((article) => (
+        <li class="category-list-item">
+          <ArticleThumbnail src={article.image_url} alt={article.title} size={72} />
+          <div class="category-list-text">
+            <div class="headline">
+              <a href={article.url} target="_blank" rel="noopener">{article.title}</a>
+            </div>
+            {article.description && <div class="desc">{article.description}</div>}
+            <div class="meta">
+              <a href={article.source_url} target="_blank" rel="noopener">{article.outlet_name}</a>
+              {article.column_name && ` / ${article.column_name}`}
+              {article.author && ` · ${article.author}`}
+            </div>
+          </div>
+        </li>
+      ))}
+    </ul>
+
+    <div class="pagination">
+      {page > 1 && <a href={`?page=${page - 1}`}>← 上一页</a>}
+      {articles.length === PAGE_SIZE && <a href={`?page=${page + 1}`}>下一页 →</a>}
+    </div>
+  </div>
+</SiteLayout>
+
+<style>
+  /* Reuses the approved .featured/.headline-list visual language from
+     ColumnBlock.astro rather than introducing new styling -- see this
+     file's header comment. */
+  .category-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-width: 700px;
+  }
+  .category-list-item {
+    display: flex;
+    gap: 10px;
+    padding: 12px 0;
+    border-bottom: 1px solid #eeeeee;
+  }
+  .category-list-item:last-child { border-bottom: none; }
+  .category-list-text .headline a {
+    color: #15c;
+    text-decoration: underline;
+    font-size: 13.5px;
+    font-weight: bold;
+    line-height: 1.4;
+  }
+  .category-list-text .headline a:visited { color: #63b; }
+  .category-list-text .desc {
+    color: #555;
+    font-size: 12px;
+    margin-top: 4px;
+    line-height: 1.5;
+  }
+  .category-list-text .meta {
+    font-size: 11px;
+    color: #999;
+    margin-top: 4px;
+  }
+  .category-list-text .meta a { color: #999; text-decoration: none; }
+  .category-list-text .meta a:hover { text-decoration: underline; }
+
+  .pagination {
+    display: flex;
+    justify-content: space-between;
+    max-width: 700px;
+    margin-top: 16px;
+    font-size: 12px;
+  }
+  .pagination a { color: #2255a4; text-decoration: none; }
+  .pagination a:hover { text-decoration: underline; }
+</style>

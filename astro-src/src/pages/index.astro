@@ -1,0 +1,69 @@
+---
+// src/pages/index.astro
+//
+// Homepage: column blocks grouped by category section, matching
+// homepage-mockup.html's approved layout. Queries D1 via
+// getHomepageBlocks() (src/lib/db.ts) -- the ranked-CTE query designed
+// and sanity-checked against schema.sql's indexes earlier in this
+// project. Real data now, not the mockup's hardcoded example articles.
+
+import { env } from "cloudflare:workers";
+import SiteLayout from "../layouts/SiteLayout.astro";
+import ColumnBlock from "../components/ColumnBlock.astro";
+import { getHomepageBlocks, type ColumnBlock as ColumnBlockData } from "../lib/db";
+
+// CORRECTED: Astro.locals.runtime.env.DB was the @astrojs/cloudflare
+// v12-and-earlier pattern. Confirmed removed as of adapter v13 / Astro
+// 6 (per Astro's own official upgrade guide, "Removed:
+// Astro.locals.runtime API" -- corroborated independently by an InfoQ
+// article covering the v6 beta announcement and a third-party Astro v6
+// upgrade skill guide, so treated as solid, not a single-source claim).
+// This project pins astro@^7.3.4 / @astrojs/cloudflare@^14.3.3, well
+// past that threshold, so the CURRENT pattern is used instead: import
+// env directly from "cloudflare:workers". See src/env.d.ts for the
+// matching Env type declaration.
+const db = env.DB;
+
+const blocks = await getHomepageBlocks(db, 6);
+
+// Category display order and labels -- matches the nav bar order from
+// SiteLayout.astro. A category section is only rendered if at least
+// one block exists for it (an empty category section would be
+// confusing on a freshly-seeded site with few columns yet).
+const CATEGORY_ORDER: { slug: string; label: string }[] = [
+  { slug: "finance", label: "财经 / 公司" },
+  { slug: "tech", label: "科技" },
+  { slug: "culture", label: "文化 / 读书" },
+  { slug: "opinion", label: "评论" },
+  { slug: "society", label: "社会" },
+  { slug: "life", label: "生活" },
+];
+
+function blocksForCategory(slug: string): ColumnBlockData[] {
+  return blocks.filter((b) => b.category === slug);
+}
+---
+
+<SiteLayout title="阅览室 — 首页" activeNav="home">
+  {CATEGORY_ORDER.map(({ slug, label }) => {
+    const categoryBlocks = blocksForCategory(slug);
+    if (categoryBlocks.length === 0) return null;
+
+    return (
+      <div class="cat-section">
+        <h2>{label}</h2>
+        <div class="block-grid">
+          {categoryBlocks.map((block) => (
+            <ColumnBlock block={block} />
+          ))}
+        </div>
+      </div>
+    );
+  })}
+
+  {blocks.length === 0 && (
+    <p style="color: #999; padding: 40px 0; text-align: center;">
+      暂无内容 -- 尚未有任何栏目成功抓取过文章。
+    </p>
+  )}
+</SiteLayout>

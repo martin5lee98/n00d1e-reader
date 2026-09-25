@@ -1,0 +1,76 @@
+{
+	// Per Astro's and Cloudflare's own current docs for deploying an
+	// on-demand-rendered Astro site to Workers -- see astro.config.mjs's
+	// header comment for the sources. Every field below traces to a real
+	// documented requirement, not a guess; deviations are commented.
+	"name": "n00dle",
+	// Update to today's date whenever you next touch this file, per
+	// Cloudflare's own guide's inline comment ("// Set this to today's
+	// date") -- compatibility_date pins which version of the Workers
+	// runtime behavior you get; bumping it periodically is normal
+	// maintenance, not something to fear breaking.
+	"compatibility_date": "2026-09-24",
+	// ⚠️ Sources disagreed on this list. Cloudflare's own framework guide
+	// (developers.cloudflare.com/workers/frameworks/framework-guides/astro/)
+	// shows both flags together; a more recently-dated example of
+	// `astro add cloudflare`'s auto-generated output showed only
+	// global_fetch_strictly_public alone. Rather than guess which is
+	// current for @astrojs/cloudflare@14.3.3, both are kept here since
+	// nodejs_compat is additive (enables Node.js API compatibility) and
+	// shouldn't cause harm if not strictly required -- but running
+	// `npx astro add cloudflare` against a real project (which
+	// regenerates this file from the adapter's own current defaults) is
+	// the authoritative way to settle this, not this file as written.
+	"compatibility_flags": [
+		"nodejs_compat",
+		"global_fetch_strictly_public"
+	],
+	// CONFIRMED against Astro's own official upgrade guide ("Upgrading
+	// to v13 and Astro 6" -> "Changed: Wrangler entrypoint
+	// configuration", docs.astro.build/en/guides/integrations-guide/cloudflare/):
+	// "Previously, the main field in your Wrangler configuration pointed
+	// to the built worker file (e.g. dist/_worker.js/index.js). With
+	// Astro 6, this has changed to point to a new unified entrypoint
+	// provided by the Cloudflare adapter:
+	// @astrojs/cloudflare/entrypoints/server." Since this project pins
+	// astro@^7.3.4 and @astrojs/cloudflare@^14.3.3 (package.json), both
+	// well past that v13/Astro 6 threshold, the new value applies here
+	// -- the old dist/_worker.js/index.js path (which an earlier version
+	// of this file used, flagged as unconfirmed at the time) has been
+	// corrected. Independently corroborated by a second source (a
+	// real migration writeup) describing the same change: "we just
+	// point main in wrangler.jsonc directly to our custom worker file...
+	// use a custom main in wrangler.jsonc (Astro v6+)".
+	//
+	// Note for later, NOT applicable to this project currently: that
+	// same source flags that a fully output:"static" Astro site with NO
+	// SSR/API routes has its Worker skipped entirely by Astro 7, making
+	// `main` ignored -- doesn't apply here since astro.config.mjs sets
+	// output: "server" and every page queries D1 at request time, but
+	// worth knowing if a future page here were ever made fully static.
+	"main": "@astrojs/cloudflare/entrypoints/server",
+	"assets": {
+		"binding": "ASSETS",
+		"directory": "./dist"
+	},
+	"observability": {
+		"enabled": true
+	},
+	// D1 binding -- this is what makes Astro.locals.runtime.env.DB exist
+	// at runtime (see src/lib/db.ts). database_id below is a PLACEHOLDER
+	// -- replace it with the real id from `wrangler d1 create <name>`'s
+	// output, or from the Cloudflare dashboard's D1 page for an
+	// already-created database. This project's schema.sql should be
+	// applied to that database with `wrangler d1 execute <name> --file
+	// schema.sql --remote` (and `--local` for local dev) before the site
+	// will have anything to query.
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "yuelanshi-articles",
+			"database_id": "a5618962-690d-408a-adbd-2054d613df37",
+			"remote": true,
+			"migrations_dir": "../../migrations"
+		}
+	]
+}

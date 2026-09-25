@@ -1,0 +1,74 @@
+name: Backup database
+
+# Weekly export of the D1 database, saved as a downloadable artifact on
+# this workflow's run page (Actions -> Backup database -> pick a run ->
+# "Artifacts" at the bottom). Same output as ./backup.sh locally:
+#   backup-<date>.sql -- full SQL dump, what you'd restore from
+#   backup-<date>.db  -- the same data as a SQLite file
+#
+# Artifacts are kept for RETENTION_DAYS below (GitHub's max is 90 for
+# most repos), so this gives you roughly the last 12 weekly backups.
+# For a permanent copy, download one now and then, or run ./backup.sh.
+#
+# Uses the same CLOUDFLARE_API_TOKEN / CLOUDFLARE_ACCOUNT_ID secrets as
+# fetch.yml and deploy.yml; the token's D1 Edit permission covers export.
+
+on:
+  schedule:
+    # Sundays 19:17 UTC = Monday 03:17 Beijing time, between fetch runs
+    # (those fire at 00/06/12/18 UTC), so the export never overlaps a write.
+    - cron: "17 19 * * 0"
+  workflow_dispatch: {}
+
+env:
+  RETENTION_DAYS: 90
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set file names
+        id: names
+        run: |
+          stamp=$(date -u +%Y-%m-%d)
+          echo "stamp=$stamp" >> "$GITHUB_OUTPUT"
+          mkdir -p "$RUNNER_TEMP/backup"
+
+      - name: Export D1
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: astro-src
+          command: d1 export yuelanshi-articles --remote --output=${{ runner.temp }}/backup/backup-${{ steps.names.outputs.stamp }}.sql
+
+      - name: Build SQLite file and sanity-check
+        working-directory: ${{ runner.temp }}/backup
+        run: |
+          sql="backup-${{ steps.names.outputs.stamp }}.sql"
+          db="backup-${{ steps.names.outputs.stamp }}.db"
+          sqlite3 "$db" < "$sql"
+          n=$(sqlite3 "$db" "SELECT COUNT(*) FROM articles;")
+          echo "Backup contains $n articles"
+          echo "### Backup ${{ steps.names.outputs.stamp }}: $n articles" >> "$GITHUB_STEP_SUMMARY"
+          # An empty articles table almost certainly means something went
+          # wrong -- fail loudly so GitHub emails you, instead of quietly
+          # saving an empty backup.
+          if [ "$n" -eq 0 ]; then
+            echo "::error::Backup has 0 articles"
+            exit 1
+          fi
+
+      - name: Upload backup
+        uses: actions/upload-artifact@v4
+        with:
+          name: yuelanshi-backup-${{ steps.names.outputs.stamp }}
+          path: ${{ runner.temp }}/backup/
+          retention-days: ${{ env.RETENTION_DAYS }}
+          if-no-files-found: error
