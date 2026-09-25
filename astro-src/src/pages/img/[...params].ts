@@ -77,7 +77,10 @@ const ALLOWED_SOURCE_HOSTS = new Set([
 ]);
 
 const MAX_WIDTH = 2000; // sanity ceiling, prevents abuse via absurd width requests
-const ALLOWED_WIDTHS = new Set([72, 150, 300, 700]); // see note below on why a fixed set
+// Values are REQUEST sizes (2x the CSS display size, for sharp thumbnails
+// on high-DPI/Retina screens) -- see ArticleThumbnail.astro's
+// REQUEST_SIZE map, which must stay in sync with this set.
+const ALLOWED_WIDTHS = new Set([144, 300, 600, 700]); // see note below on why a fixed set
 
 // A fixed, small set of allowed widths (rather than any arbitrary
 // integer) is deliberate: each DISTINCT width is its own billable
@@ -133,19 +136,24 @@ export const GET: APIRoute = async ({ params, request }) => {
 
   // The actual Cloudflare Image Resizing call -- a fetch() subrequest
   // with the cf.image options object, per Cloudflare's "Transform via
-  // Workers" docs. fit: "scale-down" (not "cover" or "contain") means
-  // the image is never upscaled past its original size -- matches the
-  // behavior independently observed from images.ft.com's own resize
-  // service earlier in this project (requesting a larger size than the
-  // source has just returns the source's real size, not an upscaled
-  // fake), so this mirrors that same non-destructive default.
+  // Workers" docs. See the inline comment on the image options below
+  // for why this crops to a square rather than scaling by width only.
   let resized: Response;
   try {
     resized = await fetch(sourceUrl.toString(), {
       cf: {
         image: {
+          // Square crop: thumbnails are always shown in a square box
+          // (ArticleThumbnail.astro). The earlier width-only
+          // "scale-down" returned e.g. 72x40 for a 16:9 photo, which the
+          // CSS then stretched to fill 72x72 -- blurry. "cover" with
+          // width = height fills the square exactly, cropping the
+          // overflow; gravity "auto" picks the most interesting region
+          // instead of always cropping around the centre.
           width,
-          fit: "scale-down",
+          height: width,
+          fit: "cover",
+          gravity: "auto",
           format: "auto", // serves AVIF/WebP when the browser supports it, per Cloudflare's docs
           quality: 85,
         },

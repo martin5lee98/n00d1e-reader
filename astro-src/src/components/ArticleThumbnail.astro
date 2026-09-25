@@ -29,7 +29,7 @@
 export interface Props {
   src: string | null;
   alt: string;
-  size?: 72 | 150 | 300 | 700; // must match ALLOWED_WIDTHS in [...params].ts
+  size?: 72 | 150 | 300 | 700; // CSS display size; see REQUEST_SIZE below
   className?: string;
 }
 
@@ -39,7 +39,17 @@ function buildProxyUrl(sourceUrl: string, width: number): string {
   return `/img/${width}/${encodeURIComponent(sourceUrl)}`;
 }
 
-const proxySrc = src ? buildProxyUrl(src, size) : null;
+// Fetch at ~2x the display size so thumbnails stay sharp on high-DPI
+// (Retina) screens. Values must be in ALLOWED_WIDTHS in
+// src/pages/img/[...params].ts.
+const REQUEST_SIZE: Record<NonNullable<Props["size"]>, number> = {
+  72: 144,
+  150: 300,
+  300: 600,
+  700: 700,
+};
+
+const proxySrc = src ? buildProxyUrl(src, REQUEST_SIZE[size]) : null;
 ---
 
 {proxySrc && (
