@@ -114,19 +114,19 @@ const activeNavMap: Record<string, any> = {
   .category-list-text .headline a {
     color: #15c;
     text-decoration: underline;
-    font-size: 13.5px;
+    font-size: 15px;
     font-weight: bold;
     line-height: 1.4;
   }
   .category-list-text .headline a:visited { color: #63b; }
   .category-list-text .desc {
     color: #555;
-    font-size: 12px;
+    font-size: 13.5px;
     margin-top: 4px;
     line-height: 1.5;
   }
   .category-list-text .meta {
-    font-size: 11px;
+    font-size: 12px;
     color: #999;
     margin-top: 4px;
   }
@@ -138,8 +138,14 @@ const activeNavMap: Record<string, any> = {
     justify-content: space-between;
     max-width: 700px;
     margin-top: 16px;
-    font-size: 12px;
+    font-size: 13px;
   }
   .pagination a { color: #2255a4; text-decoration: none; }
   .pagination a:hover { text-decoration: underline; }
+
+  @media (max-width: 720px) {
+    .category-list-text .headline a { font-size: 16px; }
+    .category-list-text .desc { font-size: 14px; }
+    .pagination { font-size: 15px; }
+  }
 </style>

@@ -82,8 +82,9 @@ const today = new Intl.DateTimeFormat("zh-CN", {
     background: #ffffff;
     color: #222222;
     font-family: "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
-    font-size: 13px;
+    font-size: 14px;
     line-height: 1.6;
+    -webkit-text-size-adjust: 100%;
   }
 
   .topbar {
@@ -97,7 +98,7 @@ const today = new Intl.DateTimeFormat("zh-CN", {
     display: flex;
     align-items: center;
     height: 34px;
-    font-size: 12px;
+    font-size: 12.5px;
     color: #777;
   }
   .topbar-inner a { color: #777; text-decoration: none; margin-right: 14px; }
@@ -123,7 +124,7 @@ const today = new Intl.DateTimeFormat("zh-CN", {
     font-family: Georgia, "Songti SC", serif;
   }
   .logo-row .tagline {
-    font-size: 12px;
+    font-size: 13px;
     color: #999;
   }
 
@@ -143,7 +144,8 @@ const today = new Intl.DateTimeFormat("zh-CN", {
   nav.categories a {
     display: block;
     padding: 8px 16px;
-    font-size: 13px;
+    font-size: 14px;
+    white-space: nowrap;
     font-weight: bold;
     color: #2255a4;
     text-decoration: none;
@@ -160,7 +162,7 @@ const today = new Intl.DateTimeFormat("zh-CN", {
 
   .cat-section { margin-bottom: 8px; }
   .cat-section h2 {
-    font-size: 15px;
+    font-size: 17px;
     font-weight: bold;
     color: #1a1a1a;
     margin: 0 0 10px 0;
@@ -184,7 +186,30 @@ const today = new Intl.DateTimeFormat("zh-CN", {
     padding: 14px 16px 30px 16px;
     border-top: 1px solid #ddd;
     color: #999;
-    font-size: 11px;
+    font-size: 12px;
+  }
+
+  /* ---- Phones / narrow screens ---- */
+  @media (max-width: 720px) {
+    body { font-size: 15px; }
+
+    .topbar-inner { padding: 0 12px; }
+    header.site { padding: 14px 12px 0 12px; }
+    main { padding: 14px 12px 32px 12px; }
+    footer { padding: 14px 12px 28px 12px; }
+
+    /* Tagline drops under the logo instead of squeezing beside it */
+    .logo-row { flex-wrap: wrap; row-gap: 2px; }
+
+    /* Category menu: one line that scrolls sideways, instead of
+       squeezing every item until the words stack vertically */
+    nav.categories { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+    nav.categories::-webkit-scrollbar { display: none; }
+    nav.categories ul { width: max-content; }
+    nav.categories a { padding: 9px 14px; font-size: 15px; }
+
+    /* Column blocks stack in a single column */
+    .block-grid { grid-template-columns: 1fr; }
   }
 </style>
 
