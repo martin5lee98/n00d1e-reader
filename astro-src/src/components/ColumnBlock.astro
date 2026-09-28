@@ -230,11 +230,9 @@ function formatArticleMeta(article: { author: string | null }): string | null {
   .load-more a:hover { text-decoration: underline; color: #2255a4; }
   .load-more a::after { content: " »"; }
 
+  /* Phones: same font sizes as desktop, just a little more room
+     between headlines so they're easier to tap. */
   @media (max-width: 720px) {
-    .featured-text .headline a { font-size: 16px; }
-    .featured-text .desc { font-size: 14px; }
     ul.headline-list li { padding: 7px 0; }
-    ul.headline-list a { font-size: 15px; line-height: 1.5; }
-    .col-block-head .src { font-size: 14px; }
   }
 </style>

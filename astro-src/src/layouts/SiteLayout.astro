@@ -190,9 +190,8 @@ const today = new Intl.DateTimeFormat("zh-CN", {
   }
 
   /* ---- Phones / narrow screens ---- */
+  /* Layout only -- font sizes are the same as desktop. */
   @media (max-width: 720px) {
-    body { font-size: 15px; }
-
     .topbar-inner { padding: 0 12px; }
     header.site { padding: 14px 12px 0 12px; }
     main { padding: 14px 12px 32px 12px; }
@@ -206,7 +205,7 @@ const today = new Intl.DateTimeFormat("zh-CN", {
     nav.categories { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
     nav.categories::-webkit-scrollbar { display: none; }
     nav.categories ul { width: max-content; }
-    nav.categories a { padding: 9px 14px; font-size: 15px; }
+    nav.categories a { padding: 9px 14px; }
 
     /* Column blocks stack in a single column */
     .block-grid { grid-template-columns: 1fr; }
