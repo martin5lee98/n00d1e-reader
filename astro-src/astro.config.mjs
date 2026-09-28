@@ -15,6 +15,7 @@
 
 import { defineConfig } from "astro/config";
 import cloudflare from "@astrojs/cloudflare";
+import { cacheCloudflare } from "@astrojs/cloudflare/cache";
 
 export default defineConfig({
   output: "server",
@@ -26,6 +27,31 @@ export default defineConfig({
       enabled: true,
     },
   }),
+  // Page caching (Astro 7 route caching + Cloudflare Workers Cache).
+  // A cached response is served by Cloudflare WITHOUT running the Worker:
+  // no D1 query, no CPU. Cache hits still count as Worker requests.
+  // The adapter turns on Workers Cache in the deployed wrangler config
+  // automatically when this provider is set. Caching is disabled in
+  // `astro dev`, so verify on the live site (look for a HIT in the
+  // response headers).
+  cache: {
+    provider: cacheCloudflare(),
+  },
+  routeRules: {
+    // Articles only change every 6 hours (fetch.yml), so a 10-minute
+    // cache costs nothing in freshness. swr: after 10 minutes, the old
+    // copy is still served instantly while a fresh one is built in the
+    // background. "N 小时前更新" labels can be up to ~10 minutes stale.
+    "/": { maxAge: 600, swr: 3600, tags: ["pages"] },
+    "/latest": { maxAge: 600, swr: 3600, tags: ["pages"] },
+    "/category/[slug]": { maxAge: 600, swr: 3600, tags: ["pages"] },
+    // A resized thumbnail for a given (width, source URL) never changes.
+    "/img/[...params]": { maxAge: 2592000, tags: ["img"] },
+    // ⚠️ The cache is keyed by URL path only, not cookies. Any future
+    // page that differs for logged-in users (e.g. 端传媒 content) MUST
+    // opt out with Astro.cache.set(false), or it could be cached and
+    // served to the public.
+  },
   vite: {
     build: {
       // Un-minified error output in wrangler's local preview, per
