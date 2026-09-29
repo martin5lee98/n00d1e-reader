@@ -44,7 +44,7 @@ function blocksForCategory(slug: string): ColumnBlockData[] {
 }
 ---
 
-<SiteLayout title="阅览室 — 首页" activeNav="home">
+<SiteLayout title="N00dle · 聚合好玩有趣的媒体内容" activeNav="home">
   {CATEGORY_ORDER.map(({ slug, label }) => {
     const categoryBlocks = blocksForCategory(slug);
     if (categoryBlocks.length === 0) return null;

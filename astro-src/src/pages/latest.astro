@@ -20,7 +20,7 @@ const db = env.DB;
 const blocks = await getLatestBlocks(db, 6);
 ---
 
-<SiteLayout title="阅览室 — 最新" activeNav="latest">
+<SiteLayout title="最新 | N00dle" activeNav="latest">
   <div class="cat-section">
     <div class="block-grid single-col">
       {blocks.map((block) => (

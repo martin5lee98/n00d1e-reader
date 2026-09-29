@@ -7,12 +7,19 @@
 // so the chrome is defined once, matching the approved mockups exactly
 // rather than duplicated (and potentially drifting) across pages.
 
+const SITE_NAME = "N00dle";
+const SITE_TAGLINE = "聚合好玩有趣的媒体内容";
+const DEFAULT_DESCRIPTION = "聚合好玩有趣的媒体内容，按财经、科技、文化、生活、社会分类";
+
 export interface Props {
   title: string;
+  // Optional per-page <meta name="description">; falls back to the
+  // site-wide default above.
+  description?: string;
   activeNav: "home" | "finance" | "tech" | "culture" | "opinion" | "society" | "life" | "latest";
 }
 
-const { title, activeNav } = Astro.props;
+const { title, activeNav, description = DEFAULT_DESCRIPTION } = Astro.props;
 
 const NAV_ITEMS: { key: Props["activeNav"]; label: string; href: string }[] = [
   { key: "home", label: "首页", href: "/" },
@@ -39,6 +46,10 @@ const today = new Intl.DateTimeFormat("zh-CN", {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{title}</title>
+  <meta name="description" content={description}>
+  <meta property="og:site_name" content={SITE_NAME}>
+  <meta property="og:title" content={title}>
+  <meta property="og:description" content={description}>
 </head>
 <body>
 
@@ -53,8 +64,8 @@ const today = new Intl.DateTimeFormat("zh-CN", {
 
 <header class="site">
   <div class="logo-row">
-    <h1>阅览室</h1>
-    <span class="tagline">中文媒体聚合 · 只做标题与摘要，不转载全文</span>
+    <h1><a href="/">{SITE_NAME}</a></h1>
+    <span class="tagline">{SITE_TAGLINE}</span>
   </div>
   <nav class="categories">
     <ul>
@@ -72,7 +83,7 @@ const today = new Intl.DateTimeFormat("zh-CN", {
 </main>
 
 <footer>
-  本站仅聚合标题、摘要与来源链接，不提供全文转载。所有内容版权归原作者及原媒体所有。
+  Made with ❤️ for Mr. Pain
 </footer>
 
 <style is:global>
@@ -123,6 +134,7 @@ const today = new Intl.DateTimeFormat("zh-CN", {
     color: #1a1a1a;
     font-family: Georgia, "Songti SC", serif;
   }
+  .logo-row h1 a { color: inherit; text-decoration: none; }
   .logo-row .tagline {
     font-size: 13px;
     color: #999;
