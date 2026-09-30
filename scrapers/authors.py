@@ -31,6 +31,8 @@ ROLE_PREFIXES = [
     # Longer prefixes first: only the first match is stripped.
     "澎湃新闻特约撰稿人",
     "澎湃新闻特约撰稿",
+    "中青报·中青网记者",
+    "中青报·中青网实习生",
     "澎湃新闻记者",
     "特约撰稿人",
     "特约撰稿",

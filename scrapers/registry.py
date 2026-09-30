@@ -36,10 +36,13 @@ presented as certain.
 
 from __future__ import annotations
 
+import os
+
 from scrapers import http_clients
 from scrapers.sites import (
     bbtnews,
     bjnews,
+    cyol,
     ftchinese,
     initium,
     latepost,
@@ -182,6 +185,25 @@ COLUMNS = {
         "fetch": lambda: bjnews.fetch_channel(
             channel_id=97,
             http_get_json=http_clients.http_get_json,
+        ),
+        "trust_description": True,
+    },
+
+    "cyol-bingdian": {
+        "site": "cyol",
+        "outlet_name": "中国青年报",
+        "column_name": "冰点周刊",
+        "category": "society",
+        "source_url": "https://zqb.cyol.com/",
+        "fetch_interval_minutes": 360,
+        # Weekly (Wednesday) printed section, read from the e-paper
+        # (see cyol.py). Looks at the last 2 issues; for a one-off
+        # backfill run:  CYOL_WEEKS=8 python3 fetch.py --column cyol-bingdian
+        "fetch": lambda: cyol.fetch_section(
+            section_name="冰点周刊",
+            weekday=2,  # Wednesday
+            http_get=http_clients.http_get,
+            weeks=int(os.environ.get("CYOL_WEEKS", "2")),
         ),
         "trust_description": True,
     },

@@ -32,6 +32,7 @@ from datetime import datetime, timezone
 from d1_client import D1Client, D1Statement, D1Error
 from scrapers.registry import COLUMNS
 from scrapers.base import RawArticle
+from scrapers.summaries import trim_summary
 
 
 def now_iso() -> str:
@@ -159,6 +160,10 @@ def run_column(db: D1Client, column_row: dict) -> tuple[int, int]:
         mark_fetch_result(db, column_id, "ok", None)
         print(f"  [OK]   {column_key}: 0 articles")
         return (0, 0)
+
+    # One summary-length rule for every source (scrapers/summaries.py).
+    for a in articles:
+        a.description = trim_summary(a.description)
 
     if not config.get("store_images", True):
         # See the "store_images" note in scrapers/registry.py.
