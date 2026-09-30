@@ -154,10 +154,42 @@ def _fetch_article(url: str, list_title: str, published_at: str, http_get: HttpG
         description=summary,
         image_url=None,
         published_at=published_at,
-        author=authors.clean_author_string(raw_author) if raw_author else None,
+        author=clean_reporter(raw_author),
         raw_author_string=raw_author,
         extra=extra,
     )
+
+
+# Labels that appear in 中国青年报 reporter lines, possibly several times
+# ("实习生 张皓宇 中青报·中青网记者 尹海月"). Longest first.
+REPORTER_LABELS = [
+    "中青报·中青网见习记者",
+    "中青报·中青网实习生",
+    "中青报·中青网记者",
+    "中青报·中青网通讯员",
+    "见习记者",
+    "特约记者",
+    "实习生",
+    "通讯员",
+    "记者",
+]
+
+
+def clean_reporter(raw: Optional[str]) -> Optional[str]:
+    """
+    "实习生 张皓宇 中青报·中青网记者 尹海月" -> "张皓宇、尹海月"
+
+    The reporter line is a space-separated run of labels and names, so
+    labels can be dropped wherever they appear and the remaining names
+    joined with 、 (the style used elsewhere on the site).
+    """
+    if not raw:
+        return None
+    s = raw
+    for label in REPORTER_LABELS:
+        s = s.replace(label, " ")
+    names = [n for n in re.split(r"[\s\u3000\xa0、，,]+", s) if n]
+    return "、".join(names) or None
 
 
 def _first_paragraph(soup) -> Optional[str]:
