@@ -28,7 +28,12 @@ from __future__ import annotations
 # per-site as they're discovered. Add to this list rather than writing
 # per-site stripping logic -- keeps the behavior centralized and visible.
 ROLE_PREFIXES = [
+    # Longer prefixes first: only the first match is stripped.
+    "澎湃新闻特约撰稿人",
+    "澎湃新闻特约撰稿",
     "澎湃新闻记者",
+    "特约撰稿人",
+    "特约撰稿",
     "记者",
     "对谈",
     "编译",
@@ -36,6 +41,9 @@ ROLE_PREFIXES = [
     "文",
     "撰文",
 ]
+
+
+SEPARATORS = "：: /\u3000"
 
 
 def clean_author_string(raw: str) -> str:
@@ -47,8 +55,15 @@ def clean_author_string(raw: str) -> str:
         return ""
     s = raw.strip()
     for prefix in ROLE_PREFIXES:
-        if s.startswith(prefix):
-            s = s[len(prefix):].lstrip("：: /").strip()
-            break  # only strip one prefix -- avoid over-stripping on an
+        if not s.startswith(prefix):
+            continue
+        rest = s[len(prefix):]
+        # Short prefixes (e.g. "文", "记者") only count as a label when
+        # followed by a separator -- otherwise a name that merely starts
+        # with the same character ("文静") would lose it.
+        if len(prefix) <= 2 and not (rest[:1] in SEPARATORS):
+            continue
+        s = rest.lstrip(SEPARATORS).strip()
+        break  # only strip one prefix -- avoid over-stripping on an
                     # unlucky match against a genuine name
     return s

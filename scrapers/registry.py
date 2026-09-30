@@ -39,6 +39,7 @@ from __future__ import annotations
 from scrapers import http_clients
 from scrapers.sites import (
     bbtnews,
+    bjnews,
     ftchinese,
     initium,
     latepost,
@@ -165,6 +166,22 @@ COLUMNS = {
         "fetch": lambda: initium.fetch_column(
             tag_slug="opinion",
             http_get=http_clients.http_get,
+        ),
+        "trust_description": True,
+    },
+
+    "bjnews-shendu": {
+        "site": "bjnews",
+        "outlet_name": "新京报",
+        "column_name": "深度",
+        "category": "society",
+        "source_url": "https://www.bjnews.com.cn/depth",
+        "fetch_interval_minutes": 360,
+        # JSON API, channel 97 = 深度 (see bjnews.py). No author in the
+        # list API, so articles show without a byline.
+        "fetch": lambda: bjnews.fetch_channel(
+            channel_id=97,
+            http_get_json=http_clients.http_get_json,
         ),
         "trust_description": True,
     },
