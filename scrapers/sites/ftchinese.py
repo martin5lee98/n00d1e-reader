@@ -8,15 +8,15 @@ no embedded JSON blob like thepaper.cn/yicai.com, no JSON API like QQ
 News. Column pages list items as repeated `.item-container` blocks.
 
 Domain split -- CONFIRMED by the user:
-    - Fetch FROM m.ftchinese.com: the user confirmed ftchinese.com has required
+    - Fetch FROM d3a1cuk57dib8p.cloudfront.net: the user confirmed ftchinese.com has required
       login to view article LIST pages for the past few months, while
-      m.ftchinese.com (also an official FT Chinese domain) does not. This
-      module fetches column/list pages from m.ftchinese.com.
+      d3a1cuk57dib8p.cloudfront.net (also an official FT Chinese domain) does not. This
+      module fetches column/list pages from d3a1cuk57dib8p.cloudfront.net.
     - Store URLs pointing AT www.ftchinese.com: per the user's explicit
       choice (ftchinese.com is the more commonly recognized/used domain
       for this outlet), stored article URLs are built against
-      www.ftchinese.com, not m.ftchinese.com, even though we fetched the list
-      from m.ftchinese.com. NOTE: whether an anonymous reader can actually open
+      www.ftchinese.com, not d3a1cuk57dib8p.cloudfront.net, even though we fetched the list
+      from d3a1cuk57dib8p.cloudfront.net. NOTE: whether an anonymous reader can actually open
       an individual www.ftchinese.com/story/{id} page without hitting a
       login wall has NOT been verified -- the user's login-required
       observation was specifically about LIST pages. If individual
@@ -203,9 +203,9 @@ def fetch_column(list_url: str, http_get: HttpGet) -> list[RawArticle]:
     """
     Fetch and parse one FT Chinese column's list page.
 
-    list_url: full URL of the column page on m.ftchinese.com, e.g.
-        "https://m.ftchinese.com/column/007000074"
-        (fetch from m.ftchinese.com, not ftchinese.com -- see module docstring)
+    list_url: full URL of the column page on d3a1cuk57dib8p.cloudfront.net, e.g.
+        "https://d3a1cuk57dib8p.cloudfront.net/column/007000074"
+        (fetch from d3a1cuk57dib8p.cloudfront.net, not ftchinese.com -- see module docstring)
     http_get: shared HTTP GET function, injected for testability.
     """
     html = http_get(list_url)

@@ -152,6 +152,21 @@ COLUMNS = {
         "trust_description": True,
     },
 
+    "initium-report": {
+        "site": "initium",
+        "outlet_name": "端傳媒",
+        "column_name": "專題",
+        "category": "society",
+        "source_url": "https://theinitium.com/tag/report/",
+        "fetch_interval_minutes": 360,
+        # Same RSS-per-tag structure as initium-opinion (initium.py).
+        "fetch": lambda: initium.fetch_column(
+            tag_slug="report",
+            http_get=http_clients.http_get,
+        ),
+        "trust_description": True,
+    },
+
     # ---------------------------------------------------------------
     # Sspai (少数派) -- TWO fetch functions exist (see sspai.py):
     # fetch_tag() is preferred for a coherent single column (per the
