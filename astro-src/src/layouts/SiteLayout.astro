@@ -16,7 +16,7 @@ export interface Props {
   // Optional per-page <meta name="description">; falls back to the
   // site-wide default above.
   description?: string;
-  activeNav: "home" | "finance" | "tech" | "culture" | "opinion" | "society" | "life" | "latest";
+  activeNav: "home" | "finance" | "tech" | "culture" | "opinion" | "society" | "international" | "life" | "latest";
 }
 
 const { title, activeNav, description = DEFAULT_DESCRIPTION } = Astro.props;
@@ -28,6 +28,7 @@ const NAV_ITEMS: { key: Props["activeNav"]; label: string; href: string }[] = [
   { key: "culture", label: "文化 / 读书", href: "/category/culture" },
   { key: "opinion", label: "评论", href: "/category/opinion" },
   { key: "society", label: "社会", href: "/category/society" },
+  { key: "international", label: "国际", href: "/category/international" },
   { key: "life", label: "生活", href: "/category/life" },
   { key: "latest", label: "最新", href: "/latest" },
 ];

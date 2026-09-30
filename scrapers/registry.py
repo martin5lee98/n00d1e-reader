@@ -71,6 +71,23 @@ COLUMNS = {
         "trust_description": False,
     },
 
+    "thepaper-waijiao-xueren": {
+        "site": "thepaper",
+        "outlet_name": "澎湃新闻",
+        "column_name": "外交学人",
+        "category": "international",
+        "source_url": "https://www.thepaper.cn/list_25481",
+        "fetch_interval_minutes": 360,
+        # Same page structure as 思想市场 (thepaper.py); no per-article
+        # summary, so descriptions are always stored as NULL.
+        "fetch": lambda: thepaper.fetch_column(
+            node_id="25481",
+            list_url="https://www.thepaper.cn/list_25481",
+            http_get=http_clients.http_get,
+        ),
+        "trust_description": False,
+    },
+
     # ---------------------------------------------------------------
     # yicai.com (第一财经) -- `var firstlist = [...]` JS blob, see yicai.py
     # ---------------------------------------------------------------

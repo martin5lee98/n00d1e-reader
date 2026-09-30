@@ -20,7 +20,7 @@ CREATE TABLE columns (
   column_key TEXT NOT NULL UNIQUE,   -- matches the Python registry key, e.g. 'thepaper-sixiang-shichang'
   outlet_name TEXT NOT NULL,         -- '第一财经' — display name
   column_name TEXT,                  -- '阅读周刊' — nullable, some sources are outlet-level not column-level
-  category TEXT NOT NULL,            -- 'culture' | 'tech' | 'society' | 'finance' | 'opinion' | 'life'
+  category TEXT NOT NULL,            -- 'culture' | 'tech' | 'society' | 'international' | 'finance' | 'opinion' | 'life'
   source_url TEXT NOT NULL,          -- column page, for the "outlet/column" header link
   fetch_interval_minutes INTEGER NOT NULL DEFAULT 60,
   active INTEGER NOT NULL DEFAULT 1, -- boolean
