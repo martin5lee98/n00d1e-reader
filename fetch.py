@@ -160,6 +160,11 @@ def run_column(db: D1Client, column_row: dict) -> tuple[int, int]:
         print(f"  [OK]   {column_key}: 0 articles")
         return (0, 0)
 
+    if not config.get("store_images", True):
+        # See the "store_images" note in scrapers/registry.py.
+        for a in articles:
+            a.image_url = None
+
     statements = articles_to_statements(column_id, articles)
     try:
         db.batch_chunked(statements)

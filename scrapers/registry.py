@@ -17,6 +17,10 @@ table -- see schema.sql) to:
     why some columns might differ from others there). Defaults to True
     if omitted; set explicitly to False for columns known not to have a
     real description.
+  - "store_images": whether to keep this column's thumbnail URLs.
+    Defaults to True; set to False to store every article with
+    image_url = NULL (fetch.py enforces this, and because the upsert
+    overwrites image_url, re-scraping also clears old thumbnails).
 
 Adding a new column on an ALREADY-SUPPORTED site (one with an existing
 scrapers/sites/*.py module) should be a single new dict entry here, not
@@ -189,6 +193,10 @@ COLUMNS = {
             http_get=http_clients.http_get,
         ),
         "trust_description": True,
+        # List-page thumbnails here are mostly licensed stock photos
+        # (e.g. Visual China Group) that don't even appear as the
+        # article's og:image -- don't store or show them.
+        "store_images": False,
     },
 
     # ---------------------------------------------------------------
@@ -210,23 +218,6 @@ COLUMNS = {
         "fetch_interval_minutes": 360,
         "fetch": lambda: latepost.fetch_column(
             programa=1,
-            http_post_json=http_clients.http_post_json,
-            page=1,
-            limit=10,
-        ),
-        "trust_description": True,
-    },
-    "latepost-interviews": {
-        "site": "latepost",
-        "outlet_name": "晚点LatePost",
-        "column_name": "人物访谈",
-        "category": "finance",
-        "source_url": "https://www.latepost.com/news/index?proma=2",
-        "fetch_interval_minutes": 360,
-        # UNCONFIRMED: programa=2 has not been independently tested;
-        # assumed to share programa=1's response shape.
-        "fetch": lambda: latepost.fetch_column(
-            programa=2,
             http_post_json=http_clients.http_post_json,
             page=1,
             limit=10,

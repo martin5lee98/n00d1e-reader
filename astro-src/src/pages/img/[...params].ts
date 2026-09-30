@@ -71,7 +71,8 @@ const ALLOWED_SOURCE_HOSTS = new Set([
   // sspai.com (scrapers/sites/sspai.py: build_image_url())
   "rssfile.sspai.com",
   // bbtnews.com.cn (scrapers/sites/bbtnews.py: already-absolute <img src>)
-  "upload.bbtnews.com.cn",
+  // "upload.bbtnews.com.cn" -- removed: 北京商报 thumbnails are no
+  // longer stored (store_images: False in scrapers/registry.py).
   // latepost.com (scrapers/sites/latepost.py: build_image_url())
   "www.latepost.com",
 ]);
