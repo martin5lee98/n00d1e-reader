@@ -4,9 +4,11 @@ scrapers/sites/cbnweek.py
 Extracts articles from 第一财经杂志 (cbnweek.com) topic lists via its
 JSON API.
 
-Endpoint (found by the user):
-    GET https://api.cbnweek.com/v5/topics/<topic_id>/articles?page=1&per=20
-    topic 14 = 新闻
+Endpoints (found by the user) -- same response format for both:
+    GET https://api.cbnweek.com/v5/topics/<id>/articles?page=1&per=20
+        topic 14 = 新闻
+    GET https://api.cbnweek.com/v5/columns/<id>/articles?page=1&per=20
+        column 1044 = 有腔调 (published in monthly batches, all on one day)
 
 Response shape (checked against a live response, 2026-10-02):
     {"code": 0, "msg": null,
@@ -28,18 +30,26 @@ from typing import Callable, Optional
 
 from ..base import RawArticle
 
-API_URL = "https://api.cbnweek.com/v5/topics/{topic_id}/articles"
+API_URL = "https://api.cbnweek.com/v5/{kind}/{list_id}/articles"
 ARTICLE_URL = "https://www.cbnweek.com/article_detail/{id}"
 
 HttpGetJson = Callable[[str, dict], dict]
 
 
 def fetch_topic(topic_id: int, http_get_json: HttpGetJson, per: int = 20) -> list[RawArticle]:
-    data = http_get_json(API_URL.format(topic_id=topic_id), {"page": 1, "per": per})
+    return fetch_list("topics", topic_id, http_get_json, per)
+
+
+def fetch_column(column_id: int, http_get_json: HttpGetJson, per: int = 20) -> list[RawArticle]:
+    return fetch_list("columns", column_id, http_get_json, per)
+
+
+def fetch_list(kind: str, list_id: int, http_get_json: HttpGetJson, per: int = 20) -> list[RawArticle]:
+    data = http_get_json(API_URL.format(kind=kind, list_id=list_id), {"page": 1, "per": per})
     if data.get("code") not in (0, "0", None):
         raise ValueError(
             f"cbnweek API returned code={data.get('code')!r} msg={data.get('msg')!r} "
-            f"for topic {topic_id}"
+            f"for {kind}/{list_id}"
         )
 
     articles = []

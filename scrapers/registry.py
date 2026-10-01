@@ -297,6 +297,21 @@ COLUMNS = {
         "trust_description": False,
     },
 
+    "cbnweek-youqiangdiao": {
+        "site": "cbnweek",
+        "outlet_name": "第一财经杂志",
+        "column_name": "有腔调",
+        "category": "life",
+        "source_url": "https://www.cbnweek.com/",
+        "fetch_interval_minutes": 360,
+        # Same API format as cbnweek-news, but a "columns" list.
+        "fetch": lambda: cbnweek.fetch_column(
+            column_id=1044,
+            http_get_json=http_clients.http_get_json,
+        ),
+        "trust_description": False,
+    },
+
     "latepost-exclusive": {
         "site": "latepost",
         "outlet_name": "晚点LatePost",
