@@ -73,6 +73,8 @@ const ALLOWED_SOURCE_HOSTS = new Set([
   // bbtnews.com.cn (scrapers/sites/bbtnews.py: already-absolute <img src>)
   // "upload.bbtnews.com.cn" -- removed: 北京商报 thumbnails are no
   // longer stored (store_images: False in scrapers/registry.py).
+  // cbnweek.com (scrapers/sites/cbnweek.py: `cover_url` field)
+  "imgcdn.cbnweek.com",
   // bjnews.com.cn (scrapers/sites/bjnews.py: `cover` field)
   "media.bjnews.com.cn",
   // latepost.com (scrapers/sites/latepost.py: build_image_url())

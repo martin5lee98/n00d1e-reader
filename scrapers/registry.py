@@ -42,6 +42,7 @@ from scrapers import http_clients
 from scrapers.sites import (
     bbtnews,
     bjnews,
+    cbnweek,
     cyol,
     ftchinese,
     initium,
@@ -280,6 +281,22 @@ COLUMNS = {
     # (unverified) that they share the same response shape -- worth
     # confirming with a real capture before fully trusting them.
     # ---------------------------------------------------------------
+    "cbnweek-news": {
+        "site": "cbnweek",
+        "outlet_name": "第一财经杂志",
+        "column_name": "新闻",
+        "category": "finance",
+        "source_url": "https://www.cbnweek.com/",
+        "fetch_interval_minutes": 360,
+        # JSON API, topic 14 = 新闻 (see cbnweek.py). No summary or
+        # author in the list, so headline + time only (like 澎湃).
+        "fetch": lambda: cbnweek.fetch_topic(
+            topic_id=14,
+            http_get_json=http_clients.http_get_json,
+        ),
+        "trust_description": False,
+    },
+
     "latepost-exclusive": {
         "site": "latepost",
         "outlet_name": "晚点LatePost",
