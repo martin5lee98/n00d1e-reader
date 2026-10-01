@@ -297,6 +297,21 @@ COLUMNS = {
         "trust_description": False,
     },
 
+    "cbnweek-youyisi": {
+        "site": "cbnweek",
+        "outlet_name": "第一财经杂志",
+        "column_name": "有意思",
+        "category": "finance",
+        "source_url": "https://www.cbnweek.com/",
+        "fetch_interval_minutes": 360,
+        # Same API format as the other cbnweek columns.
+        "fetch": lambda: cbnweek.fetch_column(
+            column_id=1040,
+            http_get_json=http_clients.http_get_json,
+        ),
+        "trust_description": False,
+    },
+
     "cbnweek-youqiangdiao": {
         "site": "cbnweek",
         "outlet_name": "第一财经杂志",
