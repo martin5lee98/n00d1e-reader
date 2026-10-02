@@ -220,6 +220,7 @@ def fetch_column(
     http_get_json: HttpGetJson,
     max_pages: int = 1,
     guest_suid: Optional[str] = None,
+    include_videos: bool = False,
 ) -> list[RawArticle]:
     """
     Fetch one author/outlet's article list from QQ News.
@@ -235,6 +236,8 @@ def fetch_column(
         recent ~20 items) since for a fast-polling column that's normally
         enough to catch new articles between runs; raise this for a
         first backfill of a newly-added column.
+    include_videos: videos are skipped by default (see _is_video); pass
+        True for a column that should keep them.
     guest_suid: the new-format id to use directly, skipping the
         resolve_guest_suid() lookup call. Pass this once you know a
         column's suid (e.g. after resolving it once and hardcoding it in
@@ -265,6 +268,8 @@ def fetch_column(
 
         newslist = data.get("newslist") or []
         for item in newslist:
+            if not include_videos and _is_video(item):
+                continue
             parsed = _parse_item(item)
             if parsed is not None:
                 articles.append(parsed)
@@ -297,6 +302,19 @@ def build_article_url(article_id: str) -> str:
     content, if that varies) before fully trusting this for every column.
     """
     return f"https://news.qq.com/rain/a/{article_id}"
+
+
+def _is_video(item: dict) -> bool:
+    """
+    The feed mixes text articles and videos. Confirmed from a real
+    response (20 items, 5 videos) -- three signals that always agreed:
+      - video_channel: an object for videos, null for articles
+      - articletype:   "4" for videos, "0" for articles
+      - id:            "…V…" for videos, "…A…" for articles
+                       (e.g. 20261001V0BR0200 vs 20261002A07YDO00)
+    Any one of the first two is enough to call it a video.
+    """
+    return bool(item.get("video_channel")) or str(item.get("articletype")) == "4"
 
 
 def _parse_item(item: dict) -> Optional[RawArticle]:
