@@ -165,6 +165,8 @@ COLUMNS = {
         "outlet_name": "端傳媒",
         "column_name": "評論",
         "category": "society",
+        # Left out of the ?r=cn version of the site (see astro-src/src/middleware.ts).
+        "hide_in_cn": True,
         "source_url": "https://theinitium.com/tag/opinion/",
         "fetch_interval_minutes": 360,
         "fetch": lambda: initium.fetch_column(
@@ -214,6 +216,8 @@ COLUMNS = {
         "outlet_name": "端傳媒",
         "column_name": "專題",
         "category": "society",
+        # Left out of the ?r=cn version of the site (see astro-src/src/middleware.ts).
+        "hide_in_cn": True,
         "source_url": "https://theinitium.com/tag/report/",
         "fetch_interval_minutes": 360,
         # Same RSS-per-tag structure as initium-opinion (initium.py).

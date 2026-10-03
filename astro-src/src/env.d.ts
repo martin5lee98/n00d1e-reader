@@ -54,3 +54,13 @@ declare namespace Cloudflare {
     DB: D1Database;
   }
 }
+
+// Set by src/middleware.ts on every page request.
+declare namespace App {
+  interface Locals {
+    // "cn" | "hk" when the URL carries a valid r parameter, else null.
+    regionParam: "cn" | "hk" | null;
+    // true for r=cn: leave out columns marked hide_in_cn.
+    hideCnRestricted: boolean;
+  }
+}

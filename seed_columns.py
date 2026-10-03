@@ -37,16 +37,17 @@ DEFAULT_INTERVAL = 360
 UPSERT_SQL = """
 INSERT INTO columns (
     site, column_key, outlet_name, column_name, category,
-    source_url, fetch_interval_minutes
+    source_url, fetch_interval_minutes, hide_in_cn
 )
-VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)
+VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)
 ON CONFLICT(column_key) DO UPDATE SET
     site = excluded.site,
     outlet_name = excluded.outlet_name,
     column_name = excluded.column_name,
     category = excluded.category,
     source_url = excluded.source_url,
-    fetch_interval_minutes = excluded.fetch_interval_minutes
+    fetch_interval_minutes = excluded.fetch_interval_minutes,
+    hide_in_cn = excluded.hide_in_cn
 """
 
 
@@ -59,6 +60,7 @@ def build_statements() -> list[D1Statement]:
             params=[
                 cfg["site"], key, cfg["outlet_name"], cfg.get("column_name"),
                 cfg["category"], cfg["source_url"], interval,
+                1 if cfg.get("hide_in_cn") else 0,
             ],
         ))
     return statements

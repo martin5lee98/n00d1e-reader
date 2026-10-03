@@ -17,6 +17,7 @@
 
 import type { ColumnBlock as ColumnBlockData } from "../lib/db";
 import ArticleThumbnail from "./ArticleThumbnail.astro";
+import { withRegion } from "../lib/region";
 
 export interface Props {
   block: ColumnBlockData;
@@ -122,7 +123,7 @@ function formatArticleMeta(article: { author: string | null }): string | null {
     )}
 
     <div class="load-more">
-      <a href={`/c/${block.column_key}`}>查看更多</a>
+      <a href={withRegion(`/c/${block.column_key}`, Astro.locals.regionParam)}>查看更多</a>
     </div>
   </div>
 </div>

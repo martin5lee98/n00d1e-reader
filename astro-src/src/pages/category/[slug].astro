@@ -23,6 +23,7 @@ import { env } from "cloudflare:workers";
 import SiteLayout from "../../layouts/SiteLayout.astro";
 import ArticleThumbnail from "../../components/ArticleThumbnail.astro";
 import { getCategoryArticles } from "../../lib/db";
+import { withRegion } from "../../lib/region";
 
 // CORRECTED: see src/pages/index.astro's detailed comment on why
 // Astro.locals.runtime.env.DB (the old, pre-v13-adapter pattern) was
@@ -51,7 +52,8 @@ const pageParam = Astro.url.searchParams.get("page");
 const page = Math.max(1, Number.parseInt(pageParam ?? "1", 10) || 1);
 const offset = (page - 1) * PAGE_SIZE;
 
-const articles = await getCategoryArticles(db, slug, PAGE_SIZE, offset);
+const articles = await getCategoryArticles(db, slug, PAGE_SIZE, offset, Astro.locals.hideCnRestricted);
+const region = Astro.locals.regionParam;
 
 const activeNavMap: Record<string, any> = {
   finance: "finance", tech: "tech", culture: "culture",
@@ -89,8 +91,8 @@ const activeNavMap: Record<string, any> = {
     </ul>
 
     <div class="pagination">
-      {page > 1 && <a href={`?page=${page - 1}`}>← 上一页</a>}
-      {articles.length === PAGE_SIZE && <a href={`?page=${page + 1}`}>下一页 →</a>}
+      {page > 1 && <a href={withRegion(`?page=${page - 1}`, region)}>← 上一页</a>}
+      {articles.length === PAGE_SIZE && <a href={withRegion(`?page=${page + 1}`, region)}>下一页 →</a>}
     </div>
   </div>
 </SiteLayout>

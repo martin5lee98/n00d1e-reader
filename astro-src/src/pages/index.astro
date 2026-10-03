@@ -24,7 +24,7 @@ import { getHomepageBlocks, type ColumnBlock as ColumnBlockData } from "../lib/d
 // matching Env type declaration.
 const db = env.DB;
 
-const blocks = await getHomepageBlocks(db, 6);
+const blocks = await getHomepageBlocks(db, 6, Astro.locals.hideCnRestricted);
 
 // Category display order and labels -- matches the nav bar order from
 // SiteLayout.astro. A category section is only rendered if at least

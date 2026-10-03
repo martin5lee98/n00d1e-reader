@@ -24,6 +24,7 @@ CREATE TABLE columns (
   source_url TEXT NOT NULL,          -- column page, for the "outlet/column" header link
   fetch_interval_minutes INTEGER NOT NULL DEFAULT 60,
   active INTEGER NOT NULL DEFAULT 1, -- boolean
+  hide_in_cn INTEGER NOT NULL DEFAULT 0, -- boolean: left out of the ?r=cn version of the site
   last_fetched_at TEXT,              -- ISO8601
   last_fetch_status TEXT,            -- 'ok' | 'error'
   last_fetch_error TEXT,             -- last error message, for the stale-column monitor

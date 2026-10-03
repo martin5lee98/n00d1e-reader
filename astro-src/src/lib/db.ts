@@ -89,7 +89,8 @@ function groupByColumn(rows: ArticleRow[]): ColumnBlock[] {
  */
 export async function getHomepageBlocks(
   db: D1Database,
-  articlesPerColumn: number = 6
+  articlesPerColumn: number = 6,
+  hideCnRestricted: boolean = false
 ): Promise<ColumnBlock[]> {
   const { results } = await db
     .prepare(
@@ -106,13 +107,14 @@ export async function getHomepageBlocks(
         FROM articles a
         JOIN columns c ON c.id = a.column_id
         WHERE c.active = 1
+          AND (?2 = 0 OR c.hide_in_cn = 0)
       )
       SELECT * FROM ranked
       WHERE rn <= ?1
       ORDER BY category, column_id, rn
       `
     )
-    .bind(articlesPerColumn)
+    .bind(articlesPerColumn, hideCnRestricted ? 1 : 0)
     .all<ArticleRow>();
 
   return groupByColumn(results);
@@ -131,7 +133,8 @@ export async function getHomepageBlocks(
  */
 export async function getLatestBlocks(
   db: D1Database,
-  articlesPerColumn: number = 6
+  articlesPerColumn: number = 6,
+  hideCnRestricted: boolean = false
 ): Promise<ColumnBlock[]> {
   const { results } = await db
     .prepare(
@@ -155,13 +158,14 @@ export async function getLatestBlocks(
         JOIN columns c ON c.id = a.column_id
         JOIN column_recency cr ON cr.column_id = a.column_id
         WHERE c.active = 1
+          AND (?2 = 0 OR c.hide_in_cn = 0)
       )
       SELECT * FROM ranked
       WHERE rn <= ?1
       ORDER BY last_activity DESC, column_id, rn
       `
     )
-    .bind(articlesPerColumn)
+    .bind(articlesPerColumn, hideCnRestricted ? 1 : 0)
     .all<ArticleRow & { last_activity: string }>();
 
   const blocks = groupByColumn(results as ArticleRow[]);
@@ -193,7 +197,8 @@ export async function getCategoryArticles(
   db: D1Database,
   category: string,
   limit: number = 30,
-  offset: number = 0
+  offset: number = 0,
+  hideCnRestricted: boolean = false
 ): Promise<ArticleRow[]> {
   const { results } = await db
     .prepare(
@@ -205,11 +210,12 @@ export async function getCategoryArticles(
       FROM articles a
       JOIN columns c ON c.id = a.column_id
       WHERE c.category = ?1 AND c.active = 1
+        AND (?4 = 0 OR c.hide_in_cn = 0)
       ORDER BY COALESCE(a.published_at, a.fetched_at) DESC
       LIMIT ?2 OFFSET ?3
       `
     )
-    .bind(category, limit, offset)
+    .bind(category, limit, offset, hideCnRestricted ? 1 : 0)
     .all<ArticleRow>();
 
   return results;

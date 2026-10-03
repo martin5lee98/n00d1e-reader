@@ -11,6 +11,8 @@ const SITE_NAME = "N00dle";
 const SITE_TAGLINE = "聚合有趣有深度的内容";
 const DEFAULT_DESCRIPTION = "聚合有趣有深度的内容，按财经、科技、文化、社会、国际、生活分类";
 
+import { withRegion } from "../lib/region";
+
 export interface Props {
   title: string;
   // Optional per-page <meta name="description">; falls back to the
@@ -20,6 +22,13 @@ export interface Props {
 }
 
 const { title, activeNav, description = DEFAULT_DESCRIPTION } = Astro.props;
+
+// Region (?r=cn / ?r=hk) is carried along on every internal link.
+const region = Astro.locals.regionParam;
+
+// Tell search engines the r=… variants are the same page as the plain URL.
+const canonicalUrl = new URL(Astro.url);
+canonicalUrl.searchParams.delete("r");
 
 const NAV_ITEMS: { key: Props["activeNav"]; label: string; href: string }[] = [
   { key: "home", label: "首页", href: "/" },
@@ -48,6 +57,7 @@ const today = new Intl.DateTimeFormat("zh-CN", {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{title}</title>
   <meta name="description" content={description}>
+  <link rel="canonical" href={canonicalUrl.toString()}>
   <meta property="og:site_name" content={SITE_NAME}>
   <meta property="og:title" content={title}>
   <meta property="og:description" content={description}>
@@ -70,8 +80,8 @@ const today = new Intl.DateTimeFormat("zh-CN", {
 
 <div class="topbar">
   <div class="topbar-inner">
-    <a href="/about">关于本站</a>
-    <a href="/rss">RSS 订阅</a>
+    <a href={withRegion("/about", region)}>关于本站</a>
+    <a href={withRegion("/rss", region)}>RSS 订阅</a>
     <div class="topbar-spacer"></div>
     <span>{today}</span>
   </div>
@@ -79,14 +89,14 @@ const today = new Intl.DateTimeFormat("zh-CN", {
 
 <header class="site">
   <div class="logo-row">
-    <h1><a href="/">{SITE_NAME}</a></h1>
+    <h1><a href={withRegion("/", region)}>{SITE_NAME}</a></h1>
     <span class="tagline">{SITE_TAGLINE}</span>
   </div>
   <nav class="categories">
     <ul>
       {NAV_ITEMS.map((item) => (
         <li class={item.key === activeNav ? "active" : ""}>
-          <a href={item.href}>{item.label}</a>
+          <a href={withRegion(item.href, region)}>{item.label}</a>
         </li>
       ))}
     </ul>

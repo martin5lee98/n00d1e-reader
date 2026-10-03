@@ -17,7 +17,7 @@ import { getLatestBlocks } from "../lib/db";
 // direct "cloudflare:workers" import.
 const db = env.DB;
 
-const blocks = await getLatestBlocks(db, 6);
+const blocks = await getLatestBlocks(db, 6, Astro.locals.hideCnRestricted);
 ---
 
 <SiteLayout title="最新 | N00dle" activeNav="latest">
