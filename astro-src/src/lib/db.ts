@@ -79,6 +79,31 @@ function groupByColumn(rows: ArticleRow[]): ColumnBlock[] {
 }
 
 /**
+ * Runs a query that filters on columns.hide_in_cn, and if the database
+ * doesn't have that column yet (code deployed before the ALTER TABLE was
+ * run -- this took the whole site down once), runs it again without the
+ * filter instead of failing. The fallback shows every column, so the
+ * r=cn version is unfiltered until the database is updated; that is
+ * logged so it shows up in `wrangler tail` / the Worker's logs.
+ */
+async function withFlagFallback<T>(run: (useFlag: boolean) => Promise<T>): Promise<T> {
+  try {
+    return await run(true);
+  } catch (err) {
+    if (String((err as Error)?.message ?? err).includes("hide_in_cn")) {
+      console.error("columns.hide_in_cn is missing -- serving unfiltered. Run the ALTER TABLE in schema.sql's hide_in_cn note.");
+      return run(false);
+    }
+    throw err;
+  }
+}
+
+// `?N = ?N` keeps the bound parameter referenced when the filter is off.
+function cnFilter(param: number, useFlag: boolean): string {
+  return useFlag ? `AND (?${param} = 0 OR c.hide_in_cn = 0)` : `AND ?${param} = ?${param}`;
+}
+
+/**
  * Homepage query: top ARTICLES_PER_COLUMN articles for every active
  * column, ordered by category then column then recency-within-column.
  * A column with zero articles is absent from the result entirely (an
@@ -92,7 +117,7 @@ export async function getHomepageBlocks(
   articlesPerColumn: number = 6,
   hideCnRestricted: boolean = false
 ): Promise<ColumnBlock[]> {
-  const { results } = await db
+  const { results } = await withFlagFallback((useFlag) => db
     .prepare(
       `
       WITH ranked AS (
@@ -107,7 +132,7 @@ export async function getHomepageBlocks(
         FROM articles a
         JOIN columns c ON c.id = a.column_id
         WHERE c.active = 1
-          AND (?2 = 0 OR c.hide_in_cn = 0)
+          ${cnFilter(2, useFlag)}
       )
       SELECT * FROM ranked
       WHERE rn <= ?1
@@ -115,7 +140,7 @@ export async function getHomepageBlocks(
       `
     )
     .bind(articlesPerColumn, hideCnRestricted ? 1 : 0)
-    .all<ArticleRow>();
+    .all<ArticleRow>());
 
   return groupByColumn(results);
 }
@@ -136,7 +161,7 @@ export async function getLatestBlocks(
   articlesPerColumn: number = 6,
   hideCnRestricted: boolean = false
 ): Promise<ColumnBlock[]> {
-  const { results } = await db
+  const { results } = await withFlagFallback((useFlag) => db
     .prepare(
       `
       WITH column_recency AS (
@@ -158,7 +183,7 @@ export async function getLatestBlocks(
         JOIN columns c ON c.id = a.column_id
         JOIN column_recency cr ON cr.column_id = a.column_id
         WHERE c.active = 1
-          AND (?2 = 0 OR c.hide_in_cn = 0)
+          ${cnFilter(2, useFlag)}
       )
       SELECT * FROM ranked
       WHERE rn <= ?1
@@ -166,7 +191,7 @@ export async function getLatestBlocks(
       `
     )
     .bind(articlesPerColumn, hideCnRestricted ? 1 : 0)
-    .all<ArticleRow & { last_activity: string }>();
+    .all<ArticleRow & { last_activity: string }>());
 
   const blocks = groupByColumn(results as ArticleRow[]);
   // Attach last_activity per block (same value across all rows of a
@@ -200,7 +225,7 @@ export async function getCategoryArticles(
   offset: number = 0,
   hideCnRestricted: boolean = false
 ): Promise<ArticleRow[]> {
-  const { results } = await db
+  const { results } = await withFlagFallback((useFlag) => db
     .prepare(
       `
       SELECT a.id, a.column_id, a.url, a.title, a.description, a.image_url,
@@ -210,13 +235,13 @@ export async function getCategoryArticles(
       FROM articles a
       JOIN columns c ON c.id = a.column_id
       WHERE c.category = ?1 AND c.active = 1
-        AND (?4 = 0 OR c.hide_in_cn = 0)
+        ${cnFilter(4, useFlag)}
       ORDER BY COALESCE(a.published_at, a.fetched_at) DESC
       LIMIT ?2 OFFSET ?3
       `
     )
     .bind(category, limit, offset, hideCnRestricted ? 1 : 0)
-    .all<ArticleRow>();
+    .all<ArticleRow>());
 
   return results;
 }
