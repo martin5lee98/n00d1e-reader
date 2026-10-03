@@ -51,6 +51,20 @@ const today = new Intl.DateTimeFormat("zh-CN", {
   <meta property="og:site_name" content={SITE_NAME}>
   <meta property="og:title" content={title}>
   <meta property="og:description" content={description}>
+  {/* Google Analytics (GA4). Only on the deployed site, so visits while
+      developing with `npm run dev` aren't counted. is:inline tells Astro
+      to output these scripts exactly as written. */}
+  {import.meta.env.PROD && (
+    <>
+      <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-5PV8MFXD7Y"></script>
+      <script is:inline>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-5PV8MFXD7Y');
+      </script>
+    </>
+  )}
 </head>
 <body>
 
