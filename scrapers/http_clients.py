@@ -24,9 +24,26 @@ in one run, rather than opening a new connection per column.
 
 from __future__ import annotations
 
+import ssl
+from pathlib import Path
 from typing import Optional
 
+import certifi
 import httpx
+
+CERTS_DIR = Path(__file__).parent / "certs"
+
+
+def ssl_context() -> ssl.SSLContext:
+    """
+    The normal trusted-certificate list, plus any extra *.pem files in
+    scrapers/certs/ (see the README there for why they're needed).
+    Certificate checking stays fully on -- this only ADDS certificates.
+    """
+    ctx = ssl.create_default_context(cafile=certifi.where())
+    for pem in sorted(CERTS_DIR.glob("*.pem")):
+        ctx.load_verify_locations(cafile=str(pem))
+    return ctx
 
 USER_AGENT = (
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
@@ -44,6 +61,7 @@ def _get_client() -> httpx.Client:
             timeout=20.0,
             headers={"User-Agent": USER_AGENT},
             follow_redirects=True,
+            verify=ssl_context(),
         )
     return _client
 
