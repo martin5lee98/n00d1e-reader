@@ -112,6 +112,23 @@ COLUMNS = {
         "trust_description": True,
     },
 
+    "yicai-shijie": {
+        "site": "yicai",
+        "outlet_name": "第一财经",
+        "column_name": "全球",
+        "category": "international",
+        "source_url": "https://www.yicai.com/news/shijie/",
+        "fetch_interval_minutes": 360,
+        # Same list-page format as yicai-books is ASSUMED (same site,
+        # same kind of page); yicai.py raises a clear error if the
+        # embedded `var firstlist` block isn't there.
+        "fetch": lambda: yicai.fetch_column(
+            list_url="https://www.yicai.com/news/shijie/",
+            http_get=http_clients.http_get,
+        ),
+        "trust_description": True,
+    },
+
     # ---------------------------------------------------------------
     # QQ News / Tencent News (腾讯新闻) -- author homepage JSON API,
     # see tencent_news.py. Only ONE author (财经杂志, media_id 5049062)
