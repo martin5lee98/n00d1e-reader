@@ -38,9 +38,9 @@ if (!slug || !validCategories.includes(slug)) {
 }
 
 const CATEGORY_LABELS: Record<string, string> = {
-  finance: "财经 / 公司",
+  finance: "财经",
   tech: "科技",
-  culture: "文化 / 读书",
+  culture: "文化",
   opinion: "评论",
   society: "社会",
   international: "国际",
@@ -116,11 +116,12 @@ const activeNavMap: Record<string, any> = {
   .category-list-item:last-child { border-bottom: none; }
   .category-list-text .headline a {
     color: #15c;
-    text-decoration: underline;
+    text-decoration: none;
     font-size: 15px;
     font-weight: bold;
     line-height: 1.4;
   }
+  .category-list-text .headline a:hover { text-decoration: underline; }
   .category-list-text .headline a:visited { color: #63b; }
   .category-list-text .desc {
     color: #555;

@@ -31,9 +31,9 @@ const blocks = await getHomepageBlocks(db, 6, Astro.locals.hideCnRestricted);
 // one block exists for it (an empty category section would be
 // confusing on a freshly-seeded site with few columns yet).
 const CATEGORY_ORDER: { slug: string; label: string }[] = [
-  { slug: "finance", label: "财经 / 公司" },
+  { slug: "finance", label: "财经" },
   { slug: "tech", label: "科技" },
-  { slug: "culture", label: "文化 / 读书" },
+  { slug: "culture", label: "文化" },
   { slug: "opinion", label: "评论" },
   { slug: "society", label: "社会" },
   { slug: "international", label: "国际" },

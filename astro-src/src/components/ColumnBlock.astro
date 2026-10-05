@@ -179,11 +179,12 @@ function formatArticleMeta(article: { author: string | null }): string | null {
   }
   .featured-text .headline a {
     color: #15c;
-    text-decoration: underline;
+    text-decoration: none;
     font-size: 15px;
     font-weight: bold;
     line-height: 1.4;
   }
+  .featured-text .headline a:hover { text-decoration: underline; }
   .featured-text .headline a:visited { color: #63b; }
   .featured-text .desc {
     color: #555;
@@ -209,9 +210,10 @@ function formatArticleMeta(article: { author: string | null }): string | null {
   ul.headline-list li:last-child { border-bottom: none; }
   ul.headline-list a {
     color: #15c;
-    text-decoration: underline;
+    text-decoration: none;
     font-size: 14px;
   }
+  ul.headline-list a:hover { text-decoration: underline; }
   ul.headline-list a:visited { color: #63b; }
   ul.headline-list .meta {
     color: #999;
