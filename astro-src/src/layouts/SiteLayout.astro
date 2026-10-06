@@ -93,6 +93,8 @@ const today = new Intl.DateTimeFormat("zh-CN", {
   </div>
 </div>
 
+{/* Sticky: the site title stays at the top of the screen while the
+    page scrolls; the category menu below it scrolls away. */}
 <header class="site">
   <div class="logo-row">
     <h1><a href={withRegion("/", region)}>{SITE_NAME}</a></h1>
@@ -100,7 +102,6 @@ const today = new Intl.DateTimeFormat("zh-CN", {
   </div>
 </header>
 
-{/* Sticky bar: stays at the top of the screen while the page scrolls. */}
 <div class="navbar">
   <div class="navbar-inner">
     <nav class="categories">
@@ -154,15 +155,19 @@ const today = new Intl.DateTimeFormat("zh-CN", {
   .topbar-spacer { flex: 1; }
 
   header.site {
-    max-width: 1040px;
-    margin: 0 auto;
-    padding: 18px 16px 0 16px;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: #ffffff;
+    border-bottom: 1px solid #ececec;
   }
   .logo-row {
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 10px 16px 8px 16px;
     display: flex;
     align-items: baseline;
     gap: 10px;
-    margin-bottom: 6px;
   }
   .logo-row h1 {
     font-size: 24px;
@@ -177,16 +182,10 @@ const today = new Intl.DateTimeFormat("zh-CN", {
     color: #999;
   }
 
-  .navbar {
-    position: sticky;
-    top: 0;
-    z-index: 20;
-    background: #ffffff;
-  }
   .navbar-inner {
     max-width: 1040px;
     margin: 0 auto;
-    padding: 8px 16px;
+    padding: 10px 16px 8px 16px;
   }
 
   nav.categories {
@@ -255,13 +254,15 @@ const today = new Intl.DateTimeFormat("zh-CN", {
   /* Layout only -- font sizes are the same as desktop. */
   @media (max-width: 720px) {
     .topbar-inner { padding: 0 12px; }
-    header.site { padding: 14px 12px 0 12px; }
-    .navbar-inner { padding: 8px 12px; }
+    .logo-row { padding: 9px 12px 7px 12px; }
+    .navbar-inner { padding: 10px 12px 8px 12px; }
     main { padding: 6px 12px 32px 12px; }
     footer { padding: 14px 12px 28px 12px; }
 
-    /* Tagline drops under the logo instead of squeezing beside it */
-    .logo-row { flex-wrap: wrap; row-gap: 2px; }
+    /* Keep the sticky title bar to one slim line: the tagline is cut
+       with "…" if it doesn't fit beside the logo. */
+    .logo-row .tagline { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+    .logo-row h1 { flex-shrink: 0; }
 
     /* Category menu: one line that scrolls sideways, instead of
        squeezing every item until the words stack vertically */
