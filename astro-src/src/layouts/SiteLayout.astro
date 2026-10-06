@@ -11,6 +11,7 @@ const SITE_NAME = "N00dle";
 const SITE_TAGLINE = "聚合有趣有深度的内容";
 const DEFAULT_DESCRIPTION = "聚合有趣有深度的内容，按财经、科技、文化、社会、国际、生活分类";
 
+import { ClientRouter } from "astro:transitions";
 import { withRegion } from "../lib/region";
 
 export interface Props {
@@ -58,6 +59,11 @@ const today = new Intl.DateTimeFormat("zh-CN", {
   <title>{title}</title>
   <meta name="description" content={description}>
   <link rel="canonical" href={canonicalUrl.toString()}>
+  {/* App-like navigation: clicking an internal link swaps in the new
+      page without a full reload (and starts loading it as soon as the
+      link is hovered or touched). Pages are still rendered on the
+      server, so caching and the ?r= region logic are unaffected. */}
+  <ClientRouter />
   <meta property="og:site_name" content={SITE_NAME}>
   <meta property="og:title" content={title}>
   <meta property="og:description" content={description}>
@@ -92,16 +98,22 @@ const today = new Intl.DateTimeFormat("zh-CN", {
     <h1><a href={withRegion("/", region)}>{SITE_NAME}</a></h1>
     <span class="tagline">{SITE_TAGLINE}</span>
   </div>
-  <nav class="categories">
-    <ul>
-      {NAV_ITEMS.map((item) => (
-        <li class={item.key === activeNav ? "active" : ""}>
-          <a href={withRegion(item.href, region)}>{item.label}</a>
-        </li>
-      ))}
-    </ul>
-  </nav>
 </header>
+
+{/* Sticky bar: stays at the top of the screen while the page scrolls. */}
+<div class="navbar">
+  <div class="navbar-inner">
+    <nav class="categories">
+      <ul>
+        {NAV_ITEMS.map((item) => (
+          <li class={item.key === activeNav ? "active" : ""}>
+            <a href={withRegion(item.href, region)}>{item.label}</a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  </div>
+</div>
 
 <main>
   <slot />
@@ -150,7 +162,7 @@ const today = new Intl.DateTimeFormat("zh-CN", {
     display: flex;
     align-items: baseline;
     gap: 10px;
-    margin-bottom: 14px;
+    margin-bottom: 6px;
   }
   .logo-row h1 {
     font-size: 24px;
@@ -165,7 +177,20 @@ const today = new Intl.DateTimeFormat("zh-CN", {
     color: #999;
   }
 
+  .navbar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: #ffffff;
+  }
+  .navbar-inner {
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 8px 16px;
+  }
+
   nav.categories {
+    position: relative; /* so the "keep active item in view" script measures from here */
     background: #eef3f9;
     border: 1px solid #c9d7e5;
     border-radius: 3px;
@@ -194,7 +219,7 @@ const today = new Intl.DateTimeFormat("zh-CN", {
   main {
     max-width: 1040px;
     margin: 0 auto;
-    padding: 18px 16px 40px 16px;
+    padding: 10px 16px 40px 16px;
   }
 
   .cat-section { margin-bottom: 8px; }
@@ -231,7 +256,8 @@ const today = new Intl.DateTimeFormat("zh-CN", {
   @media (max-width: 720px) {
     .topbar-inner { padding: 0 12px; }
     header.site { padding: 14px 12px 0 12px; }
-    main { padding: 14px 12px 32px 12px; }
+    .navbar-inner { padding: 8px 12px; }
+    main { padding: 6px 12px 32px 12px; }
     footer { padding: 14px 12px 28px 12px; }
 
     /* Tagline drops under the logo instead of squeezing beside it */
@@ -248,6 +274,18 @@ const today = new Intl.DateTimeFormat("zh-CN", {
     .block-grid { grid-template-columns: 1fr; }
   }
 </style>
+
+<script>
+  // Runs on the first load and after every client-side page change.
+  // On phones the menu scrolls sideways; make sure the current category
+  // is visible instead of the menu jumping back to the start.
+  document.addEventListener("astro:page-load", () => {
+    const nav = document.querySelector<HTMLElement>("nav.categories");
+    const active = nav?.querySelector<HTMLElement>("li.active");
+    if (!nav || !active || nav.scrollWidth <= nav.clientWidth) return;
+    nav.scrollLeft = active.offsetLeft - (nav.clientWidth - active.offsetWidth) / 2;
+  });
+</script>
 
 </body>
 </html>
