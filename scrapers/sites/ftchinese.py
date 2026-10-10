@@ -204,7 +204,7 @@ def fetch_column(list_url: str, http_get: HttpGet) -> list[RawArticle]:
     Fetch and parse one FT Chinese column's list page.
 
     list_url: full URL of the column page on cn.ft.com, e.g.
-        "https://cn.ft.com/column/007000074"
+        "https://ddbyvsiqtdx6m.cloudfront.net/column/007000074"
         (fetch from cn.ft.com, not ftchinese.com -- see module docstring)
     http_get: shared HTTP GET function, injected for testability.
     """
