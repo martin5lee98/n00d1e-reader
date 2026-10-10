@@ -129,6 +129,21 @@ COLUMNS = {
         "trust_description": True,
     },
 
+    "yicai-kechuang": {
+        "site": "yicai",
+        "outlet_name": "第一财经",
+        "column_name": "科技",
+        "category": "tech",
+        "source_url": "https://www.yicai.com/news/kechuang/",
+        "fetch_interval_minutes": 360,
+        # Same list-page format as the other yicai columns (yicai.py).
+        "fetch": lambda: yicai.fetch_column(
+            list_url="https://www.yicai.com/news/kechuang/",
+            http_get=http_clients.http_get,
+        ),
+        "trust_description": True,
+    },
+
     # ---------------------------------------------------------------
     # QQ News / Tencent News (腾讯新闻) -- author homepage JSON API,
     # see tencent_news.py. Only ONE author (财经杂志, media_id 5049062)
