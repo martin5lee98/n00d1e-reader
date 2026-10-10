@@ -44,7 +44,15 @@ export const onRequest = defineMiddleware(async (context, next) => {
   if (r && VALID_REGIONS.has(r)) {
     locals.regionParam = r as RegionParam;
     locals.hideCnRestricted = r === "cn";
-    return next();
+    const response = await next();
+    // Standard cache header for CloudFront (which sits in front of this
+    // site and ignores Cloudflare's own Cloudflare-CDN-Cache-Control).
+    // Pages with r= are the same for every visitor, so shared caches may
+    // keep them for 10 minutes; browsers always re-check (max-age=0).
+    if (response.status === 200 && !response.headers.has("Cache-Control")) {
+      return withHeaders(response, { "Cache-Control": "public, max-age=0, s-maxage=600" });
+    }
+    return response;
   }
 
   locals.regionParam = null;
@@ -54,10 +62,18 @@ export const onRequest = defineMiddleware(async (context, next) => {
     return next();
   }
 
+  // Visitor country. Behind CloudFront, the connection comes from a
+  // CloudFront server, so Cloudflare's own lookup (request.cf.country)
+  // would give CloudFront's location; CloudFront passes the real
+  // visitor's country in CloudFront-Viewer-Country instead (forwarded by
+  // the AllViewerExceptHostHeader origin request policy). This header
+  // could be faked by someone calling the origin directly, which only
+  // lets them pick a version they could also pick with ?r=.
   // DEBUG_COUNTRY is only for testing with `wrangler dev --var`; it is
   // not set in production.
   const country: string | undefined =
     (env as { DEBUG_COUNTRY?: string }).DEBUG_COUNTRY ??
+    request.headers.get("CloudFront-Viewer-Country") ??
     (request as Request & { cf?: { country?: string } }).cf?.country;
 
   const target = country ? REGION_BY_COUNTRY[country] : undefined;
