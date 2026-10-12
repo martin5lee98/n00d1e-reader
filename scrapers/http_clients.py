@@ -47,8 +47,8 @@ def ssl_context() -> ssl.SSLContext:
 
 USER_AGENT = (
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
-    "(KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36 "
-)
+    "(KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"
+).strip()  # a trailing space makes every request fail (illegal header value)
 
 _client: Optional[httpx.Client] = None
 

@@ -45,6 +45,7 @@ from scrapers.sites import (
     bjnews,
     cbnweek,
     cyol,
+    dw,
     infzm,
     ftchinese,
     initium,
@@ -110,6 +111,40 @@ COLUMNS = {
         # Standard RSS feed (bbc.py); summaries are BBC's own.
         "fetch": lambda: bbc.fetch_feed(
             feed_url="https://feeds.bbci.co.uk/zhongwen/trad/rss.xml",
+            http_get=http_clients.http_get,
+        ),
+        "trust_description": True,
+    },
+
+    "dw-zh-zhengzhi": {
+        "site": "dw",
+        "outlet_name": "德国之声",
+        "column_name": "政治",
+        "category": "politics",
+        "source_url": "https://www.dw.com/zh/政治/s-1681",
+        "fetch_interval_minutes": 360,
+        # Left out of the ?r=cn version of the site, like BBC.
+        "hide_in_cn": True,
+        # window.__APP_STATE__ JSON in the section page (dw.py).
+        "fetch": lambda: dw.fetch_section(
+            section_url="https://www.dw.com/zh/%E6%94%BF%E6%B2%BB/s-1681",
+            http_get=http_clients.http_get,
+        ),
+        "trust_description": True,
+    },
+
+    "dw-zh-jingji": {
+        "site": "dw",
+        "outlet_name": "德国之声",
+        "column_name": "经济",
+        "category": "finance",
+        "source_url": "https://www.dw.com/zh/经济/s-1682",
+        "fetch_interval_minutes": 360,
+        # Left out of the ?r=cn version of the site, like DW 政治.
+        "hide_in_cn": True,
+        # Same page layout as DW 政治 -- window.__APP_STATE__ (dw.py).
+        "fetch": lambda: dw.fetch_section(
+            section_url="https://www.dw.com/zh/%E7%BB%8F%E6%B5%8E/s-1682",
             http_get=http_clients.http_get,
         ),
         "trust_description": True,

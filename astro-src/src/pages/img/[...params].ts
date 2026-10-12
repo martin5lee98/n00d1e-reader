@@ -77,6 +77,8 @@ const ALLOWED_SOURCE_HOSTS = new Set([
   "imgcdn.cbnweek.com",
   // BBC (scrapers/sites/bbc.py: media:thumbnail in the RSS feed)
   "ichef.bbci.co.uk",
+  // DW (scrapers/sites/dw.py: mainContentImage.staticUrl)
+  "static.dw.com",
   // bjnews.com.cn (scrapers/sites/bjnews.py: `cover` field)
   "media.bjnews.com.cn",
   // latepost.com (scrapers/sites/latepost.py: build_image_url())
