@@ -5,9 +5,8 @@ Extracts articles from a BBC RSS feed, e.g. BBC 中文 (Traditional):
     https://feeds.bbci.co.uk/zhongwen/trad/rss.xml
 
 Written against the standard BBC RSS layout (title, description, link,
-guid, pubDate, media:thumbnail). The feed itself could not be fetched from
-the development environment, so check it once against a real copy
-(docs/samples/bbc-zhongwen-trad.xml) -- see the CAVEATS below.
+guid, pubDate, media:thumbnail). Verified against a real copy of the feed
+(docs/samples/bbc-zhongwen-trad.xml, 38 items, all /articles/ pages).
 
 Field mapping:
   title            -> title
@@ -16,20 +15,19 @@ Field mapping:
                       (BBC adds ?at_medium=RSS&at_campaign=rss...), so the
                       same story always gets the same URL / database row
   pubDate          -> published_at (RFC 822 with timezone -> UTC)
-  media:thumbnail  -> image_url (largest one offered)
+  media:thumbnail  -> image_url (largest one offered; BBC only lists a
+                      240px one, so the size segment of the ichef URL is
+                      bumped to 800px, e.g. /ace/ws/240/ -> /ace/ws/800/)
   (no author in BBC feeds)
 
 Skipped: video and live pages (URL path contains /av/, /live/ or
 /videos/), which are not readable articles.
-
-CAVEATS (until checked against a real copy of the feed):
-  - Exact thumbnail element / sizes.
-  - Whether video items use the paths above.
 """
 
 from __future__ import annotations
 
 import calendar
+import re
 from datetime import datetime, timezone
 from typing import Callable, Optional
 from urllib.parse import urlsplit, urlunsplit
@@ -90,7 +88,15 @@ def _thumbnail(entry) -> Optional[str]:
     urls = [(w, u) for w, u in urls if u]
     if not urls:
         return None
-    return max(urls)[1]
+    return _upsize(max(urls)[1])
+
+
+_ICHEF_SIZE = re.compile(r"(ichef\.bbci\.co\.uk/ace/ws/)\d+/")
+
+
+def _upsize(url: str, width: int = 800) -> str:
+    """ichef serves any width from the same path: /ace/ws/240/... -> /ace/ws/800/..."""
+    return _ICHEF_SIZE.sub(rf"\g<1>{width}/", url, count=1)
 
 
 def _published_at(entry) -> Optional[str]:

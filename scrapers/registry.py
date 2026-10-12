@@ -45,6 +45,7 @@ from scrapers.sites import (
     bjnews,
     cbnweek,
     cyol,
+    infzm,
     ftchinese,
     initium,
     latepost,
@@ -210,6 +211,24 @@ COLUMNS = {
     # "opinion" tag has actually been fetched/confirmed; other tags are
     # assumed (not verified) to follow the same /tag/{slug}/rss/ pattern.
     # ---------------------------------------------------------------
+    "infzm-tuijian": {
+        "site": "infzm",
+        "outlet_name": "南方周末",
+        "column_name": "推荐",
+        "category": "society",
+        "source_url": "https://www.infzm.com/",
+        "fetch_interval_minutes": 360,
+        # Homepage 推荐 feed (term 998), JSON API (infzm.py). Only plain
+        # articles are kept (no 专题 / video / promos).
+        "fetch": lambda: infzm.fetch_term(
+            term_id=998,
+            http_get=http_clients.http_get,
+        ),
+        "trust_description": True,
+        # Covers are often agency stock photos (e.g. VCG) -- see infzm.py.
+        "store_images": False,
+    },
+
     "initium-opinion": {
         "site": "initium",
         "outlet_name": "端傳媒",
