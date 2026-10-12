@@ -9,7 +9,7 @@
 
 const SITE_NAME = "N00dle";
 const SITE_TAGLINE = "聚合有趣有深度的内容";
-const DEFAULT_DESCRIPTION = "聚合有趣有深度的内容，按财经、科技、文化、社会、国际、生活分类";
+const DEFAULT_DESCRIPTION = "聚合有趣有深度的内容，按财经、科技、文化、艺术、社会、国际、生活分类";
 
 import { ClientRouter } from "astro:transitions";
 import { withRegion } from "../lib/region";
@@ -19,7 +19,7 @@ export interface Props {
   // Optional per-page <meta name="description">; falls back to the
   // site-wide default above.
   description?: string;
-  activeNav: "home" | "politics" | "finance" | "tech" | "culture" | "opinion" | "society" | "international" | "life" | "latest";
+  activeNav: "home" | "politics" | "finance" | "tech" | "culture" | "arts" | "opinion" | "society" | "international" | "life" | "latest";
 }
 
 const { title, activeNav, description = DEFAULT_DESCRIPTION } = Astro.props;
@@ -39,6 +39,7 @@ const NAV_ITEMS: { key: Props["activeNav"]; label: string; href: string; hideInC
   { key: "finance", label: "财经", href: "/category/finance" },
   { key: "tech", label: "科技", href: "/category/tech" },
   { key: "culture", label: "文化", href: "/category/culture" },
+  { key: "arts", label: "艺术", href: "/category/arts" },
   { key: "opinion", label: "评论", href: "/category/opinion" },
   { key: "society", label: "社会", href: "/category/society" },
   { key: "international", label: "国际", href: "/category/international" },

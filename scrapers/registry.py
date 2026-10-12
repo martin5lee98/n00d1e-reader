@@ -96,6 +96,74 @@ COLUMNS = {
         "trust_description": False,
     },
 
+    "thepaper-shanghai-shuping": {
+        "site": "thepaper",
+        "outlet_name": "澎湃新闻",
+        "column_name": "上海书评",
+        "category": "culture",
+        "source_url": "https://www.thepaper.cn/list_26878",
+        "fetch_interval_minutes": 360,
+        # Same page structure as 思想市场 (thepaper.py); no per-article
+        # summary, so descriptions are always stored as NULL.
+        "fetch": lambda: thepaper.fetch_column(
+            node_id="26878",
+            list_url="https://www.thepaper.cn/list_26878",
+            http_get=http_clients.http_get,
+        ),
+        "trust_description": False,
+    },
+
+    "thepaper-fanshudang": {
+        "site": "thepaper",
+        "outlet_name": "澎湃新闻",
+        "column_name": "翻书党",
+        "category": "culture",
+        "source_url": "https://www.thepaper.cn/list_25574",
+        "fetch_interval_minutes": 360,
+        # Same page structure as 思想市场 (thepaper.py); no per-article
+        # summary, so descriptions are always stored as NULL.
+        "fetch": lambda: thepaper.fetch_column(
+            node_id="25574",
+            list_url="https://www.thepaper.cn/list_25574",
+            http_get=http_clients.http_get,
+        ),
+        "trust_description": False,
+    },
+
+    "thepaper-yishu-pinglun": {
+        "site": "thepaper",
+        "outlet_name": "澎湃新闻",
+        "column_name": "艺术评论",
+        "category": "arts",
+        "source_url": "https://www.thepaper.cn/list_25455",
+        "fetch_interval_minutes": 360,
+        # Same page structure as 思想市场 (thepaper.py); no per-article
+        # summary, so descriptions are always stored as NULL.
+        "fetch": lambda: thepaper.fetch_column(
+            node_id="25455",
+            list_url="https://www.thepaper.cn/list_25455",
+            http_get=http_clients.http_get,
+        ),
+        "trust_description": False,
+    },
+
+    "thepaper-pengpai-renwu": {
+        "site": "thepaper",
+        "outlet_name": "澎湃新闻",
+        "column_name": "澎湃人物",
+        "category": "society",
+        "source_url": "https://www.thepaper.cn/list_25427",
+        "fetch_interval_minutes": 360,
+        # Same page structure as 思想市场 (thepaper.py); no per-article
+        # summary, so descriptions are always stored as NULL.
+        "fetch": lambda: thepaper.fetch_column(
+            node_id="25427",
+            list_url="https://www.thepaper.cn/list_25427",
+            http_get=http_clients.http_get,
+        ),
+        "trust_description": False,
+    },
+
     # ---------------------------------------------------------------
     # yicai.com (第一财经) -- `var firstlist = [...]` JS blob, see yicai.py
     # ---------------------------------------------------------------
