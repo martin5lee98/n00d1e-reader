@@ -79,6 +79,8 @@ const ALLOWED_SOURCE_HOSTS = new Set([
   "ichef.bbci.co.uk",
   // DW (scrapers/sites/dw.py: mainContentImage.staticUrl)
   "static.dw.com",
+  // 美麗島電子報 (scrapers/sites/myformosa.py: homepage <figure><img>)
+  "www.my-formosa.com.tw",
   // bjnews.com.cn (scrapers/sites/bjnews.py: `cover` field)
   "media.bjnews.com.cn",
   // latepost.com (scrapers/sites/latepost.py: build_image_url())

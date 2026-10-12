@@ -94,8 +94,11 @@ def articles_to_statements(column_id: int, articles: list[RawArticle]) -> list[D
                 ON CONFLICT(url) DO UPDATE SET
                     title = excluded.title,
                     description = excluded.description,
-                    image_url = excluded.image_url
-                    -- author / raw_author / published_at / extra deliberately NOT
+                    image_url = excluded.image_url,
+                    -- a date is filled in later if the first fetch had none
+                    -- (myformosa.py only dates new articles), never changed after
+                    published_at = COALESCE(articles.published_at, excluded.published_at)
+                    -- author / raw_author / extra deliberately NOT
                     -- overwritten -- first-seen values are trusted; re-scrapes only
                     -- refresh display fields that legitimately change (e.g. a typo fix)
                     -- fetched_at is NOT in this statement at all, so it keeps its
@@ -160,6 +163,20 @@ def run_column(db: D1Client, column_row: dict) -> tuple[int, int]:
         mark_fetch_result(db, column_id, "ok", None)
         print(f"  [OK]   {column_key}: 0 articles")
         return (0, 0)
+
+    if config.get("fill_dates"):
+        # For sources whose list page has no dates (myformosa.py): only
+        # articles not yet stored with a date get their own page fetched.
+        try:
+            rows = db.execute(
+                "SELECT url FROM articles WHERE column_id = ?1 AND published_at IS NOT NULL",
+                [column_id],
+            )["results"]
+            config["fill_dates"](articles, {r["url"] for r in rows})
+        except Exception as e:
+            # Not fatal: the articles are still stored, and the missing
+            # dates are retried on the next run.
+            print(f"  [WARN] {column_key}: could not fill dates: {type(e).__name__}: {e}", file=sys.stderr)
 
     # One summary-length rule for every source (scrapers/summaries.py).
     for a in articles:

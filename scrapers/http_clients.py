@@ -72,6 +72,13 @@ def http_get(url: str) -> str:
     return resp.text
 
 
+def http_get_bytes(url: str) -> bytes:
+    """Plain GET, returns the raw body. For sites not in UTF-8 (myformosa.py is Big5)."""
+    resp = _get_client().get(url)
+    resp.raise_for_status()
+    return resp.content
+
+
 def http_get_json(url: str, params: dict) -> dict:
     """GET with query params, returns parsed JSON. For tencent_news.py, sspai.py."""
     resp = _get_client().get(url, params=params)

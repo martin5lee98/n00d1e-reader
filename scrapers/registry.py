@@ -50,6 +50,7 @@ from scrapers.sites import (
     ftchinese,
     initium,
     latepost,
+    myformosa,
     nfpeople,
     sspai,
     tencent_news,
@@ -346,6 +347,28 @@ COLUMNS = {
         "trust_description": True,
         # Covers are often agency stock photos (e.g. VCG) -- see infzm.py.
         "store_images": False,
+    },
+
+    "myformosa-zhuanlan": {
+        "site": "myformosa",
+        "outlet_name": "美麗島電子報",
+        "column_name": "專欄",
+        "category": "opinion",
+        "source_url": "https://www.my-formosa.com.tw/",
+        "fetch_interval_minutes": 360,
+        # Left out of the ?r=cn version of the site.
+        "hide_in_cn": True,
+        # Opinion pieces from the homepage (myformosa.py, Big5 page).
+        "fetch": lambda: myformosa.fetch_opinion(
+            home_url="https://www.my-formosa.com.tw/",
+            http_get_bytes=http_clients.http_get_bytes,
+        ),
+        # The homepage has no dates: fetch.py calls this with the URLs
+        # already stored with a date, so only new articles' pages are fetched.
+        "fill_dates": lambda articles, dated_urls: myformosa.fill_dates(
+            articles, dated_urls, http_get_bytes=http_clients.http_get_bytes,
+        ),
+        "trust_description": True,
     },
 
     "initium-opinion": {
