@@ -21,11 +21,10 @@ old), not current news. Checked against docs/samples/dw-zh-politics.html
 Field mapping:
   namedUrl           -> url ("https://www.dw.com" + path, percent-encoded)
   title              -> title
-  teaser/shortTeaser -> description (teaser is the full one; the "news"
-                        lists carry no teaser at all -> None)
+  teaser/shortTeaser -> description (teaser is the full one)
   contentDate        -> published_at (already UTC with Z)
   mainContentImage.staticUrl -> image_url, with ${formatId} filled in by
-                        IMAGE_FORMAT_ID (the "news" lists have no image)
+                        IMAGE_FORMAT_ID
   firstAuthorArray[].fullName -> author (、-joined)
   roadTeaserKicker   -> extra.kicker (e.g. "中国", "美国")
 
@@ -51,7 +50,7 @@ from ..base import RawArticle
 
 BASE = "https://www.dw.com"
 IMAGE_FORMAT_ID = "605"
-SKIP_COMPONENTS = {"panorama_thematic_focus", "opinion_thematic_focus"}
+SKIP_COMPONENTS = {"panorama_thematic_focus", "opinion_thematic_focus", "news_thematic_focus"}
 OPINION_GENRES = {"COMMENT", "OPINION", "COMMENTARY"}
 STATE_RE = re.compile(r"window\.__APP_STATE__\s*=\s*")
 
