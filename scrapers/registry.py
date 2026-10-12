@@ -50,6 +50,7 @@ from scrapers.sites import (
     ftchinese,
     initium,
     latepost,
+    nfpeople,
     sspai,
     tencent_news,
     thepaper,
@@ -162,6 +163,21 @@ COLUMNS = {
             http_get=http_clients.http_get,
         ),
         "trust_description": False,
+    },
+
+    "nfpeople-shehui": {
+        "site": "nfpeople",
+        "outlet_name": "南方人物周刊",
+        "column_name": "社会",
+        "category": "society",
+        "source_url": "https://www.nfpeople.com/category/21",
+        "fetch_interval_minutes": 360,
+        # Plain HTML list (nfpeople.py); no images on the list page.
+        "fetch": lambda: nfpeople.fetch_category(
+            list_url="https://www.nfpeople.com/category/21",
+            http_get=http_clients.http_get,
+        ),
+        "trust_description": True,
     },
 
     # ---------------------------------------------------------------
