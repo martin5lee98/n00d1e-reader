@@ -19,7 +19,7 @@ export interface Props {
   // Optional per-page <meta name="description">; falls back to the
   // site-wide default above.
   description?: string;
-  activeNav: "home" | "finance" | "tech" | "culture" | "opinion" | "society" | "international" | "life" | "latest";
+  activeNav: "home" | "politics" | "finance" | "tech" | "culture" | "opinion" | "society" | "international" | "life" | "latest";
 }
 
 const { title, activeNav, description = DEFAULT_DESCRIPTION } = Astro.props;
@@ -31,8 +31,11 @@ const region = Astro.locals.regionParam;
 const canonicalUrl = new URL(Astro.url);
 canonicalUrl.searchParams.delete("r");
 
-const NAV_ITEMS: { key: Props["activeNav"]; label: string; href: string }[] = [
+// hideInCn: left out of the menu in the ?r=cn version, because every
+// column in that category is hidden there (hide_in_cn in registry.py).
+const NAV_ITEMS: { key: Props["activeNav"]; label: string; href: string; hideInCn?: boolean }[] = [
   { key: "home", label: "首页", href: "/" },
+  { key: "politics", label: "时政", href: "/category/politics", hideInCn: true },
   { key: "finance", label: "财经", href: "/category/finance" },
   { key: "tech", label: "科技", href: "/category/tech" },
   { key: "culture", label: "文化", href: "/category/culture" },
@@ -106,7 +109,7 @@ const today = new Intl.DateTimeFormat("zh-CN", {
   <div class="navbar-inner">
     <nav class="categories">
       <ul>
-        {NAV_ITEMS.map((item) => (
+        {NAV_ITEMS.filter((item) => !(item.hideInCn && Astro.locals.hideCnRestricted)).map((item) => (
           <li class={item.key === activeNav ? "active" : ""}>
             <a href={withRegion(item.href, region)}>{item.label}</a>
           </li>

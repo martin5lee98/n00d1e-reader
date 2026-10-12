@@ -40,6 +40,7 @@ import os
 
 from scrapers import http_clients
 from scrapers.sites import (
+    bbc,
     bbtnews,
     bjnews,
     cbnweek,
@@ -96,6 +97,23 @@ COLUMNS = {
     # ---------------------------------------------------------------
     # yicai.com (第一财经) -- `var firstlist = [...]` JS blob, see yicai.py
     # ---------------------------------------------------------------
+    "bbc-zhongwen-trad": {
+        "site": "bbc",
+        "outlet_name": "BBC中文",
+        "column_name": None,
+        "category": "politics",
+        "source_url": "https://www.bbc.com/zhongwen/trad",
+        "fetch_interval_minutes": 360,
+        # Left out of the ?r=cn version of the site (see astro-src/src/middleware.ts).
+        "hide_in_cn": True,
+        # Standard RSS feed (bbc.py); summaries are BBC's own.
+        "fetch": lambda: bbc.fetch_feed(
+            feed_url="https://feeds.bbci.co.uk/zhongwen/trad/rss.xml",
+            http_get=http_clients.http_get,
+        ),
+        "trust_description": True,
+    },
+
     "yicai-books": {
         "site": "yicai",
         "outlet_name": "第一财经",

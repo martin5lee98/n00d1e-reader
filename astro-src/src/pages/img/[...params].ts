@@ -75,6 +75,8 @@ const ALLOWED_SOURCE_HOSTS = new Set([
   // longer stored (store_images: False in scrapers/registry.py).
   // cbnweek.com (scrapers/sites/cbnweek.py: `cover_url` field)
   "imgcdn.cbnweek.com",
+  // BBC (scrapers/sites/bbc.py: media:thumbnail in the RSS feed)
+  "ichef.bbci.co.uk",
   // bjnews.com.cn (scrapers/sites/bjnews.py: `cover` field)
   "media.bjnews.com.cn",
   // latepost.com (scrapers/sites/latepost.py: build_image_url())

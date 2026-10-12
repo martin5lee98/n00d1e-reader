@@ -31,7 +31,7 @@ import { withRegion } from "../../lib/region";
 const db = env.DB;
 
 const { slug } = Astro.params;
-const validCategories = ["finance", "tech", "culture", "opinion", "society", "international", "life"];
+const validCategories = ["politics", "finance", "tech", "culture", "opinion", "society", "international", "life"];
 
 if (!slug || !validCategories.includes(slug)) {
   return new Response(null, { status: 404 });
@@ -44,6 +44,7 @@ const CATEGORY_LABELS: Record<string, string> = {
   opinion: "评论",
   society: "社会",
   international: "国际",
+  politics: "时政",
   life: "生活",
 };
 
@@ -57,7 +58,7 @@ const region = Astro.locals.regionParam;
 
 const activeNavMap: Record<string, any> = {
   finance: "finance", tech: "tech", culture: "culture",
-  opinion: "opinion", society: "society", international: "international", life: "life",
+  opinion: "opinion", society: "society", international: "international", life: "life", politics: "politics",
 };
 ---
 
