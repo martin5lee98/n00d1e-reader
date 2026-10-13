@@ -7,7 +7,10 @@ on:
     # articles/day, so every 6 hours is plenty. To bring back a fast tier,
     # set a column's interval to <= 30 and re-add a "*/15 * * * *" cron
     # line here plus its branch in the "Determine tier" step below.
-    - cron: "0 */6 * * *"
+    # :17 past the hour, not :00 -- GitHub delays and sometimes silently
+    # drops scheduled runs at the top of the hour, when it is busiest.
+    # Times are UTC: 00:17, 06:17, 12:17, 18:17.
+    - cron: "17 */6 * * *"
   workflow_dispatch:
     # Manual trigger, with an optional single-column override for debugging
     # a specific scraper without running the whole batch.
