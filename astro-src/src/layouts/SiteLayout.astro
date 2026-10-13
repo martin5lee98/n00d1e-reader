@@ -63,6 +63,12 @@ const today = new Intl.DateTimeFormat("zh-CN", {
   <title>{title}</title>
   <meta name="description" content={description}>
   <link rel="canonical" href={canonicalUrl.toString()}>
+  {/* Site icons (files in astro-src/public/). SVG for modern browsers,
+      a 32px PNG fallback, and a 180px icon for phone home screens. */}
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <meta name="theme-color" content="#2F4F9E">
   {/* App-like navigation: clicking an internal link swaps in the new
       page without a full reload (and starts loading it as soon as the
       link is hovered or touched). Pages are still rendered on the
@@ -101,7 +107,9 @@ const today = new Intl.DateTimeFormat("zh-CN", {
     page scrolls; the category menu below it scrolls away. */}
 <header class="site">
   <div class="logo-row">
-    <h1><a href={withRegion("/", region)}>{SITE_NAME}</a></h1>
+    {/* Logo image (astro-src/public/logo.svg); the alt text keeps the
+        site name readable for search engines and screen readers. */}
+    <h1><a href={withRegion("/", region)}><img class="logo" src="/logo.svg" alt={SITE_NAME} width="110" height="32"></a></h1>
     <span class="tagline">{SITE_TAGLINE}</span>
   </div>
 </header>
@@ -170,8 +178,8 @@ const today = new Intl.DateTimeFormat("zh-CN", {
     margin: 0 auto;
     padding: 10px 16px 8px 16px;
     display: flex;
-    align-items: baseline;
-    gap: 10px;
+    align-items: center;
+    gap: 12px;
   }
   .logo-row h1 {
     font-size: 24px;
@@ -180,7 +188,8 @@ const today = new Intl.DateTimeFormat("zh-CN", {
     color: #1a1a1a;
     font-family: Georgia, "Songti SC", serif;
   }
-  .logo-row h1 a { color: inherit; text-decoration: none; }
+  .logo-row h1 a { color: inherit; text-decoration: none; display: block; line-height: 0; }
+  .logo-row h1 img.logo { display: block; height: 32px; width: auto; }
   .logo-row .tagline {
     font-size: 13px;
     color: #999;
