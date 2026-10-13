@@ -69,6 +69,22 @@ const today = new Intl.DateTimeFormat("zh-CN", {
   <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <meta name="theme-color" content="#2F4F9E">
+  {/* Installable app (PWA): manifest + icons in astro-src/public/, and a
+      service worker (public/sw.js) that only adds an offline page -- it
+      never caches news pages. The apple-* tags are for iPhone/iPad
+      "Add to Home Screen". */}
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="N00dle">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  {import.meta.env.PROD && (
+    <script is:inline>
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => navigator.serviceWorker.register("/sw.js"));
+      }
+    </script>
+  )}
   {/* App-like navigation: clicking an internal link swaps in the new
       page without a full reload (and starts loading it as soon as the
       link is hovered or touched). Pages are still rendered on the
