@@ -196,6 +196,21 @@ COLUMNS = {
         "trust_description": True,
     },
 
+    "nfpeople-wenhua": {
+        "site": "nfpeople",
+        "outlet_name": "南方人物周刊",
+        "column_name": "文化",
+        "category": "culture",
+        "source_url": "https://www.nfpeople.com/category/23",
+        "fetch_interval_minutes": 360,
+        # Same list-page layout as 社会 (nfpeople.py); no images on the list page.
+        "fetch": lambda: nfpeople.fetch_category(
+            list_url="https://www.nfpeople.com/category/23",
+            http_get=http_clients.http_get,
+        ),
+        "trust_description": True,
+    },
+
     # ---------------------------------------------------------------
     # yicai.com (第一财经) -- `var firstlist = [...]` JS blob, see yicai.py
     # ---------------------------------------------------------------
