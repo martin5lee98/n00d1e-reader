@@ -83,6 +83,8 @@ const ALLOWED_SOURCE_HOSTS = new Set([
   "www.my-formosa.com.tw",
   // 时代周刊 (scrapers/sites/timeweekly.py: photo_title)
   "marmot-obs.timesmedia.com.cn",
+  // 雷峰网 (scrapers/sites/leiphone.py: first <img> in the feed item)
+  "static.leiphone.com",
   // bjnews.com.cn (scrapers/sites/bjnews.py: `cover` field)
   "media.bjnews.com.cn",
   // latepost.com (scrapers/sites/latepost.py: build_image_url())

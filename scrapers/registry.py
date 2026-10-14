@@ -50,6 +50,7 @@ from scrapers.sites import (
     ftchinese,
     initium,
     latepost,
+    leiphone,
     myformosa,
     nfpeople,
     sspai,
@@ -336,6 +337,21 @@ COLUMNS = {
     # see tencent_news.py. Only ONE author (财经杂志, media_id 5049062)
     # has actually been tested end-to-end.
     # ---------------------------------------------------------------
+    "leiphone-feed": {
+        "site": "leiphone",
+        "outlet_name": "雷峰网",
+        "column_name": None,
+        "category": "tech",
+        "source_url": "https://www.leiphone.com/",
+        "fetch_interval_minutes": 360,
+        # Site-wide RSS feed, filtered to 独家 + longer pieces (leiphone.py).
+        "fetch": lambda: leiphone.fetch_feed(
+            feed_url="https://www.leiphone.com/feed",
+            http_get=http_clients.http_get,
+        ),
+        "trust_description": False,
+    },
+
     "tencent-news-tech": {
         "site": "tencent_news",
         "outlet_name": "腾讯科技",
