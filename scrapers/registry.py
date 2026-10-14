@@ -55,6 +55,7 @@ from scrapers.sites import (
     sspai,
     tencent_news,
     thepaper,
+    timeweekly,
     yicai,
 )
 
@@ -164,6 +165,23 @@ COLUMNS = {
             http_get=http_clients.http_get,
         ),
         "trust_description": False,
+    },
+
+    "timeweekly-yaowen": {
+        "site": "timeweekly",
+        "outlet_name": "时代周刊",
+        "column_name": "要闻",
+        "category": "politics",
+        # A mainland outlet, so unlike the other 时政 sources it is NOT
+        # hidden on ?r=cn -- there, 时政 shows just this column.
+        "source_url": "https://www.time-weekly.com/category/6",
+        "fetch_interval_minutes": 360,
+        # JSON list endpoint (timeweekly.py).
+        "fetch": lambda: timeweekly.fetch_category(
+            category_id=6,
+            http_get=http_clients.http_get,
+        ),
+        "trust_description": True,
     },
 
     "nfpeople-shehui": {

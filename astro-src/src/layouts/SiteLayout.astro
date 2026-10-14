@@ -31,11 +31,12 @@ const region = Astro.locals.regionParam;
 const canonicalUrl = new URL(Astro.url);
 canonicalUrl.searchParams.delete("r");
 
-// hideInCn: left out of the menu in the ?r=cn version, because every
-// column in that category is hidden there (hide_in_cn in registry.py).
+// hideInCn: left out of the menu in the ?r=cn version. Use it only for a
+// category whose columns are ALL hidden there (hide_in_cn in registry.py).
+// None right now: 时政 has 时代周刊, which shows on ?r=cn.
 const NAV_ITEMS: { key: Props["activeNav"]; label: string; href: string; hideInCn?: boolean }[] = [
   { key: "home", label: "首页", href: "/" },
-  { key: "politics", label: "时政", href: "/category/politics", hideInCn: true },
+  { key: "politics", label: "时政", href: "/category/politics" },
   { key: "finance", label: "财经", href: "/category/finance" },
   { key: "international", label: "国际", href: "/category/international" },
   { key: "tech", label: "科技", href: "/category/tech" },
